@@ -1,7 +1,5 @@
-def get_mask_card_number():
+def get_mask_card_number(user_card_number_input):
     """Функция скрытия части вводимого номера карты."""
-    # Ввод номера карты
-    user_card_number_input = input("Ввод номера карты: ")[:16]
     # Удаление возможных пробелов
     user_card_number = user_card_number_input.replace(
         " ", ""
@@ -27,7 +25,7 @@ def get_mask_card_number():
         ]
     )
 
-print(get_mask_card_number())
+print(get_mask_card_number(input("Ввод номера карты: ")[:16]))
 
 
 def get_mask_account(user_account_number_input):
@@ -47,6 +45,3 @@ def get_mask_account(user_account_number_input):
     return result
 
 print(get_mask_account(input("Ввод номера счета: ")[:20]))
-
-# print(get_mask_account())
-# print(get_mask_account.__doc__)
