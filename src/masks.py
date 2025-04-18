@@ -1,6 +1,7 @@
-import re
+# import re
 
-def get_mask_card_number(user_card_number_input):
+
+def get_mask_card_number(user_card_number_input: str) -> str:
     """Функция скрытия части вводимого номера карты."""
     # Удаление возможных пробелов
     user_card_number = (user_card_number_input[:16].replace(" ", ""))
@@ -28,7 +29,7 @@ def get_mask_card_number(user_card_number_input):
 # print(get_mask_card_number(input("Ввод номера карты: ")))
 
 
-def get_mask_account(user_account_number_input):
+def get_mask_account(user_account_number_input: str) -> str:
     """Функция отображения последних 4 символов номера счета."""
     # Удаление возможных пробелов
     user_account_number = user_account_number_input[:20].replace(' ', '')
