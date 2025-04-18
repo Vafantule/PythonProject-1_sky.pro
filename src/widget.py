@@ -17,3 +17,15 @@ def mask_account_card(string: str) -> str:
 
 
 # print(mask_account_card(input("Ввод номера: ")))
+
+
+def get_date(unformatted_date: str) -> str:
+    """Форматирование даты. Функция"""
+    #Обрезка строки до "даты" по формату
+    date_object = datetime.datetime.strptime(unformatted_date[:10], "%Y-%m-%d").date()
+    #Приведение даты к формату
+    formatted_date = date_object.strftime("%d.%m.%Y")
+    return formatted_date
+
+
+# print(get_date("2024-03-11T02:26:18.671407"))
