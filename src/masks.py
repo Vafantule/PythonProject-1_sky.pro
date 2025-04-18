@@ -1,9 +1,9 @@
+import re
+
 def get_mask_card_number(user_card_number_input):
     """Функция скрытия части вводимого номера карты."""
     # Удаление возможных пробелов
-    user_card_number = user_card_number_input.replace(
-        " ", ""
-    )
+    user_card_number = (user_card_number_input[:16].replace(" ", ""))
 
     # Подстановка "*" вместо цифр, кроме первых_6, последних_4
     private_card_number = (
@@ -25,23 +25,16 @@ def get_mask_card_number(user_card_number_input):
         ]
     )
 
-print(get_mask_card_number(input("Ввод номера карты: ")[:16]))
+# print(get_mask_card_number(input("Ввод номера карты: ")))
 
 
 def get_mask_account(user_account_number_input):
     """Функция отображения последних 4 символов номера счета."""
     # Удаление возможных пробелов
-    user_account_number = user_account_number_input.replace(
-        " ", ""
-    )
+    user_account_number = user_account_number_input[:20].replace(' ', '')
 
     # Подстановка "*" вместо цифр, кроме последних_4
-    private_account_number = (
-        "*" * len(user_account_number[:-4])
-    ) + user_account_number[-4:]
+    private_account_number = "*" * len(user_account_number[-2:]) + user_account_number[-4:]
+    return private_account_number
 
-    # Обрезка до последних 6 символов
-    result = private_account_number[-6:]
-    return result
-
-print(get_mask_account(input("Ввод номера счета: ")[:20]))
+# print(get_mask_account(input("Ввод номера счета: ")))
