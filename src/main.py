@@ -50,3 +50,32 @@ def get_not_sort_numbers(list_1: List[int], list_2: List[int]) -> List[int]:
 
 # if __name__ == "__main__":
 #     print(get_not_sort_numbers([1, 2, 3, 4], [3, 4, 5, 6]))
+
+
+"""
+Исправьте код, содержащий ошибки PEP 8 и плохой нейминг. 
+Добавьте docstring и аннотации типов. Flake8 и mypy 
+не должны выдавать ошибок.
+"""
+
+
+def circle_area(radius: int) -> int:
+    """
+    Вычисление радиуса по формуле. Функция.
+    :param radius:
+    :return:
+    """
+    PI = 3.14
+    circleArea = PI * radius ** 2
+    return circleArea
+
+def format_description(radius, area):
+    return "Radius is " + str(radius) + "; area is " + str(round(area, 2))
+
+def get_info(radius: float):
+    area = circle_area(radius)
+    description = format_description(radius, area)
+    print(description)
+
+radius_final = int(input("Enter circle radius (int): "))
+get_info(radius_final)
