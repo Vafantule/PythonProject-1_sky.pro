@@ -153,8 +153,20 @@ def filter_russain_names(names_list: list) -> list:
     for name_item in names_list:
         if is_cyrillic(name_item):
             rus_names_list.append(name_item)
-
     return rus_names_list
+
+
+def filter_english_names(names_list: list) -> list:
+    """
+    Отбработка имен написанных на английском языке. Функция
+    :param names_list:
+    :return:
+    """
+    eng_names_list = list()
+    for name_item in names_list:
+        if not is_cyrillic(name_item):
+            eng_names_list.append(name_item)
+    return eng_names_list
 
 
 def save_to_file(file_name: str, data: str) -> None:
@@ -174,5 +186,10 @@ if __name__ == "__main__":
     filtered_names = filter_russain_names(cleared_names)
     save_to_file(
         "russsian_names.txt",
+        "\n".join(filtered_names)
+    )
+    filtered_names = filter_english_names(cleared_names)
+    save_to_file(
+        "english_names.txt",
         "\n".join(filtered_names)
     )
