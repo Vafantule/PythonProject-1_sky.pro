@@ -9,7 +9,7 @@ from typing import List
 def get_sort_numbers(list_1: List[int], list_2: List[int]) -> List[int]:
     result = list(filter(lambda elem: elem in list_1, list_2))
     return result
-
+    # return list(set(list_1) & set(list_2))
 
 # if __name__ == "__main__":
     # print(get_sort_numbers([1, 2, 3, 4], [3, 4, 5, 6]))
@@ -33,3 +33,20 @@ def palindrome_list(unformatted_string: List[int]) -> List[int]:
 
 # if __name__ == "__main__":
     # print(palindrome_list([121, 123, 131, 34543]))
+
+
+"""
+Написать функцию, 
+которая получает на вход два списка чисел и возвращает новый список, 
+содержащий только те числа, которые есть только в одном из списков.
+"""
+
+
+def get_not_sort_numbers(list_1: List[int], list_2: List[int]) -> List[int]:
+    # result = list(filter(lambda element: element not in list_2, list_1))
+    # return result
+    list_3 = list(set(list_1) - set(list_2)) + list(set(list_2) - set(list_1))
+    return list_3
+
+# if __name__ == "__main__":
+#     print(get_not_sort_numbers([1, 2, 3, 4], [3, 4, 5, 6]))
