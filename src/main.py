@@ -1,12 +1,11 @@
+from typing import List
+import os, re
+
 """
 Написать функцию,
 которая получает на вход два списка чисел и возвращает новый список,
 содержащий только те числа, которые встречаются в обоих списках.
 """
-
-from typing import List
-import os
-
 
 def get_sort_numbers(list_1: List[int], list_2: List[int]) -> List[int]:
     result = list(filter(lambda elem: elem in list_1, list_2))
@@ -135,7 +134,25 @@ def clear_names(file_name: str) -> list:
     return formatted_names_list
 
 
+def is_cyrillic(name_item: str) -> bool:
+    return bool(re.search('[а-яА-Я]', name_item))
+
+
+def filter_russain_names(names_list: list) -> list:
+    """
+    Отбработка имен написанных на русском языке. Функция
+    :param names_list:
+    :return:
+    """
+    rus_names_list = list()
+    for name_item in names_list:
+        if is_cyrillic(name_item):
+            rus_names_list.append(name_item)
+
+    return rus_names_list
+
+
 if __name__ == "__main__":
     cleared_names = clear_names('names.txt')
-    for index in cleared_names:
-        print(index)
+    # for index in cleared_names:
+    print(filter_russain_names(cleared_names))
