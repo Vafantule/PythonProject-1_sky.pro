@@ -1,11 +1,12 @@
+import re
 from typing import List
-import os, re
 
 """
 Написать функцию,
 которая получает на вход два списка чисел и возвращает новый список,
 содержащий только те числа, которые встречаются в обоих списках.
 """
+
 
 def get_sort_numbers(list_1: List[int], list_2: List[int]) -> List[int]:
     result = list(filter(lambda elem: elem in list_1, list_2))
@@ -74,7 +75,7 @@ def circle_area(radius: float) -> float:
     return circle_area
 
 
-def format_description(radius: float, area: float):
+def format_description(radius: float, area: float) -> str:
     """
     Отформатированный вывод площади круга.
     """
@@ -134,14 +135,20 @@ def clear_names(file_name: str) -> list:
     return formatted_names_list
 
 
-def is_cyrillic(name_item: str) -> bool:
-    """
-    Проверка кириллицы. Функция
-    :param name_item:
-    :return:
-    """
-    return bool(re.search('[а-яА-Я]', name_item))
+# def is_cyrillic(name_item: str) -> bool:
+#     """
+#     Проверка кириллицы. Функция
+#     :param name_item:
+#     :return:
+#     """
+#     return bool(re.search('[а-яА-Я]{2,}', name_item))
 
+
+def is_cyrillic(name_item: str) -> bool:
+    russian = [word for word in name_item if 1039 < ord(word[0])]
+    return russian
+
+# words = ['apple', 'cat', 'яблоко', 'кот', 'building', 'машина', 'status',]
 
 def filter_russain_names(names_list: list) -> list:
     """
@@ -182,6 +189,7 @@ def save_to_file(file_name: str, data: str) -> None:
 
 if __name__ == "__main__":
     cleared_names = clear_names('names.txt')
+    # print(is_cyrillic(cleared_names))
     # for index in cleared_names:
     filtered_names = filter_russain_names(cleared_names)
     save_to_file(
