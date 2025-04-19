@@ -135,6 +135,11 @@ def clear_names(file_name: str) -> list:
 
 
 def is_cyrillic(name_item: str) -> bool:
+    """
+    Проверка кириллицы. Функция
+    :param name_item:
+    :return:
+    """
     return bool(re.search('[а-яА-Я]', name_item))
 
 
@@ -152,7 +157,22 @@ def filter_russain_names(names_list: list) -> list:
     return rus_names_list
 
 
+def save_to_file(file_name: str, data: str) -> None:
+    """
+    Сохранение обработанных данных в файл.
+    :param file_name:
+    :param data:
+    :return:
+    """
+    with open('data/' + file_name, "w", encoding='utf-8') as names_file:
+        names_file.write(data)
+
+
 if __name__ == "__main__":
     cleared_names = clear_names('names.txt')
     # for index in cleared_names:
-    print(filter_russain_names(cleared_names))
+    filtered_names = filter_russain_names(cleared_names)
+    save_to_file(
+        "russsian_names.txt",
+        "\n".join(filtered_names)
+    )
