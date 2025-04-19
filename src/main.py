@@ -5,6 +5,7 @@
 """
 
 from typing import List
+import os
 
 
 def get_sort_numbers(list_1: List[int], list_2: List[int]) -> List[int]:
@@ -94,3 +95,47 @@ def get_info(radius: float) -> None:
 # if __name__ == "__main__":
     radius_final = int(input("Enter circle radius (int): "))
     get_info(radius_final)
+
+
+# # Указываем путь к директории
+# current_directory = os.listdir("../data")
+# print(current_directory)
+
+# Получаем список файлов
+# files = os.listdir(current_directory)
+
+# Выводим список файлов
+# print(files)
+
+# path = '/data/names.txt'
+#
+# directory_name = os.path.basename(path)
+# print(directory_name)
+
+
+# path = os.path.join(os.path.dirname(__file__), "data", "names.txt").replace('\\', '/')
+# path = os.path.abspath("data/names.txt").replace('\\', '/')
+
+def clear_names(file_name: str) -> list:
+    """
+    Очистка имен от ненужных символов. Функция
+    :param file_name:
+    :return:
+    """
+    formatted_names_list = list()
+    with open('data/' + file_name, "r", encoding='utf-8') as names_file:
+        names_list = names_file.read().split()
+        for name_item in names_list:
+            new_name = ''
+            for symbol in name_item:
+                if symbol.isalpha():
+                    new_name += symbol
+            if new_name.isalpha():
+                formatted_names_list.append(new_name)
+    return formatted_names_list
+
+
+if __name__ == "__main__":
+    cleared_names = clear_names('names.txt')
+    for index in cleared_names:
+        print(index)
