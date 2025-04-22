@@ -148,7 +148,6 @@ def is_cyrillic(name_item: str) -> bool:
     russian = [word for word in name_item if 1039 < ord(word[0])]
     return russian
 
-# words = ['apple', 'cat', 'яблоко', 'кот', 'building', 'машина', 'status',]
 
 def filter_russain_names(names_list: list) -> list:
     """
