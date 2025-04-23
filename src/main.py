@@ -186,9 +186,9 @@ def save_to_file(file_name: str, data: str) -> None:
         names_file.write(data)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     cleared_names = clear_names('names.txt')
-    # print(is_cyrillic(cleared_names))
+    print(is_cyrillic(cleared_names))
     # for index in cleared_names:
     filtered_names = filter_russain_names(cleared_names)
     save_to_file(
