@@ -1,4 +1,4 @@
-def filter_by_state(state: str) -> str:
+def filter_by_state(state: str="EXECUTED") -> str:
     pass
 
 
@@ -13,8 +13,8 @@ def filter_by_state(state: str) -> str:
 
 def sort_by_date(sort_types, ascending=True):
     """
-    Осуществляет сортировку массива данных по заданной переменной. Функция.
-    :param sort_types: Массив данных.
+    Осуществляет сортировку данных по заданной переменной. Функция.
+    :param sort_types: Данные.
     :param ascending: Направление сортировки.
     :return: Возвращает отсортированный список по заданной переменной.
     """
