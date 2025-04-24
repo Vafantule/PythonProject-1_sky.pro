@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 def filter_by_state(select_values: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
@@ -12,7 +12,7 @@ def filter_by_state(select_values: List[Dict[str, Any]], state: str = "EXECUTED"
     return select_value
 
 
-def sort_by_date(sort_types: List[Dict], reverse: bool = True) -> List[Dict]:
+def sort_by_date(sort_types: List[Dict[str, Any]], reverse: bool = True) -> List[Dict[str, Any]]:
     """
     Осуществляет сортировку данных по заданной переменной. Функция.
     :param sort_types: Данные.
