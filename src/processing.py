@@ -1,6 +1,12 @@
 from typing import List, Dict
 
 def filter_by_state(select_values: List[Dict], state: str="EXECUTED") -> List[Dict]:
+    """
+    Отбор данных по заданному значению. Функция.
+    :param select_values: Данные.
+    :param state: Отбор значения.
+    :return: Возвращает список по заданной переменной.
+    """
     select_value = [value for value in select_values if value.get("state") == state]
     return select_value
 
