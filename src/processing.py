@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 
-def filter_by_state(select_values: List[Dict], state: str="EXECUTED") -> List[Dict]:
+def filter_by_state(select_values: List[Dict], state: str = "EXECUTED") -> List[Dict]:
     """
     Отбор данных по заданному значению. Функция.
     :param select_values: Данные.
@@ -12,7 +12,7 @@ def filter_by_state(select_values: List[Dict], state: str="EXECUTED") -> List[Di
     return select_value
 
 
-def sort_by_date(sort_types: List[Dict], reverse: bool=True) -> List[Dict]:
+def sort_by_date(sort_types: List[Dict], reverse: bool = True) -> List[Dict]:
     """
     Осуществляет сортировку данных по заданной переменной. Функция.
     :param sort_types: Данные.
