@@ -1,4 +1,5 @@
-from typing import List, Dict
+from typing import Dict, List
+
 
 def filter_by_state(select_values: List[Dict], state: str="EXECUTED") -> List[Dict]:
     """
