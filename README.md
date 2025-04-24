@@ -33,14 +33,23 @@ pip install -r requirements.txt
 ```python
 from src.processing import filter_by_state, sort_by_date
 
-operations = [
+transactions = [
     {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
     {'id': 59402872, 'state': 'CANCELLED', 'date': '2018-09-17T21:27:25.241241'}
 ]
 
 # Фильтрация операций с состоянием "EXECUTED"
-executed_operations = filter_by_state(select_values)
+executed_transactions = filter_by_state(transactions)
 
 # Сортировка операций по дате в порядке убывания
-sorted_operations = sort_by_date(sort_types)
+sorted_transactions = sort_by_date(transactions)
+```
 
+
+## Документация:
+
+Для получения дополнительной информации обратитесь к [документации](README.md).
+
+## Лицензия:
+
+Этот проект не лицензирован.
