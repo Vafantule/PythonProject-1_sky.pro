@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-def filter_by_state(select_values, state="EXECUTED"):
+def filter_by_state(select_values: List[Dict], state: str="EXECUTED") -> List[Dict]:
     select_value = [value for value in select_values if value.get("state") == state]
     return select_value
 
