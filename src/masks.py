@@ -1,5 +1,6 @@
 import re
 
+
 def get_mask_card_number(user_card_number_input: str) -> str:
     # Удаление возможных пробелов
     # user_card_number = user_card_number_input.split()[-1][:16]
