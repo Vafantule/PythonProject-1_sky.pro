@@ -1,9 +1,11 @@
-import  pytest
+import pytest
+
 from src.widget import get_date, mask_account_card
+
 # from src.masks import get_mask_account, get_mask_card_number
 
 
-## Блок тестирования 'mask_account_card'
+# Блок тестирования 'mask_account_card'
 wrong_card_account_number = "Номер некорректный"
 # @pytest.fixture
 # def mask_card():
@@ -23,8 +25,6 @@ wrong_card_account_number = "Номер некорректный"
     ("Visa Classic 6831982476737658", "Visa Classic 6831 98** **** 7658"),
     ("Visa Platinum 8990922113665229", "Visa Platinum 8990 92** **** 5229"),
 ])
-
-
 def test_mask_account_card(value: str, expected: str) -> None:
     assert mask_account_card(value) == expected
 
@@ -44,14 +44,12 @@ def test_mask_account_card_empty() -> None:
     ("Visa Gold 5999 414228426353", wrong_card_account_number),
     ("Счет 6468647367889477 9589", wrong_card_account_number),
 ])
-
-
 def test_mask_account_card_wrong(value: str, expected: str) -> None:
     assert mask_account_card(value) == expected
 
 
-## Блок тестирования 'get_date'
-def test_get_date_valid_format():
+# Блок тестирования 'get_date'
+def test_get_date_valid_format() -> None:
     """
     Тестирование функции get_date с корректным форматом входных данных.
     """
@@ -62,7 +60,7 @@ def test_get_date_valid_format():
     assert result == expected_output, f"Ожидалось {expected_output}, но получено {result}"
 
 
-def test_get_date_invalid_format():
+def test_get_date_invalid_format() -> None:
     """
     Тестирование функции get_date с некорректным форматом входных данных.
     Проверяем, что возникает ValueError при неправильном формате.
@@ -73,7 +71,7 @@ def test_get_date_invalid_format():
         get_date(invalid_input)
 
 
-def test_get_date_edge_cases():
+def test_get_date_edge_cases() -> None:
     """
     Тестирование граничных случаев, таких как начало и конец года.
     """
