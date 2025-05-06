@@ -1,10 +1,25 @@
-from src.masks import get_mask_card_number, get_mask_account
+import re
 import datetime
+from src.masks import get_mask_card_number, get_mask_account
 
 
-def mask_account_card(string: str) -> str:
+
+def mask_account_card(string_to_mask: str) -> str:
     """Платеж. система карты либо 'Счет', скрытие символов номера. Функция"""
-    # Если ввод только номера
+    ### Честно спизженый код у другого студента.
+    # if card := re.search(r"(\s\d{16}$)", string_to_mask):
+    #     return (f"{string_to_mask[:card.start()]} "
+    #             f"{get_mask_card_number(string_to_mask.group()[1:])}"
+    #             )
+    # elif account := re.search(r"(\s\d{20}$)", string_to_mask):
+    #     return (f"{string_to_mask[:account.start()]} "
+    #             f"{get_mask_account(string_to_mask.group()[1:])}"
+    #             )
+    # else:
+    #     return "Номер некорректный"
+
+
+    # # Если ввод только номера
     if string.isdigit():
         return get_mask_card_number(string)
     # Если в строке содержится "Счет", формирование строки по формату
@@ -17,7 +32,8 @@ def mask_account_card(string: str) -> str:
         return string[:-16] + get_mask_card_number(card_number)
 
 
-# print(mask_account_card(input("Ввод номера: ")))
+if __name__ == "__main__":
+    print(mask_account_card(input("Ввод номера: ")))
 
 
 def get_date(unformatted_date: str) -> str:
@@ -29,4 +45,5 @@ def get_date(unformatted_date: str) -> str:
     return formatted_date
 
 
-# print(get_date("2024-03-11T02:26:18.671407"))
+if __name__ == "__main__":
+    print(get_date("2024-03-11T02:26:18.671407"))
