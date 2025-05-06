@@ -1,7 +1,8 @@
 import pytest
-from src.masks import get_mask_card_number, get_mask_account
 
-## Блок тестирования номера карты.
+from src.masks import get_mask_account, get_mask_card_number
+
+# Блок тестирования номера карты.
 incorrect_number_card = "Номер карты не корректный. Просьба вводить только !! 16 !! цифр."
 
 
@@ -17,14 +18,11 @@ def test_get_mask_card_number(card_number: str) -> None:
     ("Карта 6831982476737658", incorrect_number_card),
     ("номер карты", incorrect_number_card),
 ])
-
-
 def test_get_mask_card_wrong_number(card: str, expected: str) -> None:
     assert get_mask_card_number(card) == expected
 
 
-## Блок тестирования номера счета.
-
+# Блок тестирования номера счета.
 incorrect_number_account = "Номер счета не корректный. Просьба вводить только !! 20 !! цифр."
 
 
@@ -40,7 +38,5 @@ def test_get_mask_account(account_number: str) -> None:
     ("номер карты", incorrect_number_account),
     ("Счет 7I5830O73472675895", incorrect_number_account),
 ])
-
-
 def test_get_mask_wrong_account(account: str, expected: str) -> None:
     assert get_mask_account(account) == expected
