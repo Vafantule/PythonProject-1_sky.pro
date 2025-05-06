@@ -38,7 +38,7 @@ def get_mask_card_number(user_card_number_input: str) -> str:
     """
     Функция скрытия части вводимого номера карты.
     :param user_card_number_input: Вводимый номер карты.
-    :return: Вывод отформатированной строки.
+    :return: Вывод отформатированной строки номера карты.
     """
     if re.match(r"\d{16}$", user_card_number_input):
         return (f"{user_card_number_input[0:4]} "
@@ -48,19 +48,29 @@ def get_mask_card_number(user_card_number_input: str) -> str:
         return "Номер карты не корректный. Просьба вводить только !! 16 !! цифр."
 
 
-if __name__ == "__main__":
-    print(get_mask_card_number(input("Ввод номера карты: ")))
+# if __name__ == "__main__":
+#     print(get_mask_card_number(input("Ввод номера карты: ")))
 
 
 def get_mask_account(user_account_number_input: str) -> str:
-    """Функция отображения последних 4 символов номера счета."""
-    # Удаление возможных пробелов
-    user_account_number = user_account_number_input[:20].replace(' ', '')
+        # Удаление возможных пробелов
+    # user_account_number = user_account_number_input[:20].replace(' ', '')
+    #
+    # # Подстановка "*" вместо цифр, кроме последних_4
+    # private_account_number = "*" * len(user_account_number[-2:]) + user_account_number[-4:]
+    # return private_account_number
 
-    # Подстановка "*" вместо цифр, кроме последних_4
-    private_account_number = "*" * len(user_account_number[-2:]) + user_account_number[-4:]
-    return private_account_number
+    """
+    Функция отображения последних 4 символов номера счета.
+    :param user_account_number_input: Вводимый номер счета.
+    :return: Вывод отформатированной строки номера счета.
+    """
+
+    if re.match(r"\d{20}$", user_account_number_input):
+        return f"**{user_account_number_input[-4:]}"
+    else:
+        return "Номер счета не корректный. Просьба вводить только !! 20 !! цифр."
 
 
-# if __name__ == "__main__":
-#     print(get_mask_account(input("Ввод номера счета: ")))
+if __name__ == "__main__":
+    print(get_mask_account(input("Ввод номера счета: ")))
