@@ -1,23 +1,39 @@
-from src.masks import get_mask_card_number, get_mask_account
 import datetime
+import re
+
+from src.masks import get_mask_account, get_mask_card_number
 
 
-def mask_account_card(string: str) -> str:
+def mask_account_card(string_to_mask: str) -> str:
     """Платеж. система карты либо 'Счет', скрытие символов номера. Функция"""
-    # Если ввод только номера
-    if string.isdigit():
-        return get_mask_card_number(string)
-    # Если в строке содержится "Счет", формирование строки по формату
-    elif "Счет" in string:
-        account_number = string[-20:]
-        return string[:5] + get_mask_account(account_number)
-    # Если в строке содержится Платеж. система, формирование строки по формату
+    ### Честно спизженый код у другого студента.
+    if card := re.search(r"(\s\d{16}$)", string_to_mask):
+        return (f"{string_to_mask[:card.start()]} "
+                f"{get_mask_card_number(card.group()[1:])}"
+                )
+    elif account := re.search(r"(\s\d{20}$)", string_to_mask):
+        return (f"{string_to_mask[:account.start()]} "
+                f"{get_mask_account(account.group()[1:])}"
+                )
     else:
-        card_number = " ".join(string[-16:].split())
-        return string[:-16] + get_mask_card_number(card_number)
+        return "Номер некорректный"
 
 
-# print(mask_account_card(input("Ввод номера: ")))
+    # # Если ввод только номера
+    # if string_to_mask.isdigit():
+    #     return get_mask_card_number(string_to_mask)
+    # # Если в строке содержится "Счет", формирование строки по формату
+    # elif "Счет" in string_to_mask:
+    #     account_number = string_to_mask[-20:]
+    #     return string_to_mask[:5] + get_mask_account(account_number)
+    # # Если в строке содержится Платеж. система, формирование строки по формату
+    # else:
+    #     card_number = " ".join(string_to_mask[-16:].split())
+    #     return string_to_mask[:-16] + get_mask_card_number(card_number)
+
+
+if __name__ == "__main__":
+    print(mask_account_card(input("Ввод номера: ")))
 
 
 def get_date(unformatted_date: str) -> str:
@@ -29,4 +45,5 @@ def get_date(unformatted_date: str) -> str:
     return formatted_date
 
 
-# print(get_date("2024-03-11T02:26:18.671407"))
+if __name__ == "__main__":
+    print(get_date("2024-03-11T02:26:18.671407"))
