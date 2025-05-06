@@ -49,7 +49,7 @@ def get_mask_card_number(user_card_number_input: str) -> str:
 
 
 # if __name__ == "__main__":
-#     print(get_mask_card_number(input("Ввод номера карты: ")))
+    print(get_mask_card_number(input("Ввод номера карты: ")))
 
 
 def get_mask_account(user_account_number_input: str) -> str:
@@ -72,5 +72,5 @@ def get_mask_account(user_account_number_input: str) -> str:
         return "Номер счета не корректный. Просьба вводить только !! 20 !! цифр."
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     print(get_mask_account(input("Ввод номера счета: ")))
