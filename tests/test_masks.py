@@ -25,22 +25,22 @@ def test_get_mask_card_wrong_number(card: str, expected: str) -> None:
 
 ## Блок тестирования номера счета.
 
-# incorrect_number_account = "Номер счета не корректный. Просьба вводить только !! 20 !! цифр"
-#
-#
-# def test_get_mask_account(account_number: str) -> None:
-#     assert get_mask_account(account_number) == "**0123"
-#
-#
-# @pytest.mark.parametrize("account, expected", [
-#     ("", incorrect_number_account),
-#     # ("0123456", incorrect_number_account),
-#     # ("0159994142284263530123", incorrect_number_account),
-#     # ("8990-9221-1366-5229", incorrect_number_account),
-#     # ("номер карты", incorrect_number_account),
-#     # ("Счет 7I5830O73472675895", incorrect_number_account),
-# ])
-#
-#
-# def test_get_mask_wrong_account(account: str, expected: str) -> None:
-#     assert get_mask_account(account) == expected
+incorrect_number_account = "Номер счета не корректный. Просьба вводить только !! 20 !! цифр."
+
+
+def test_get_mask_account(account_number: str) -> None:
+    assert get_mask_account(account_number) == "**0123"
+
+
+@pytest.mark.parametrize("account, expected", [
+    ("", incorrect_number_account),
+    ("0123456", incorrect_number_account),
+    ("0159994142284263530123", incorrect_number_account),
+    ("8990-9221-1366-5229", incorrect_number_account),
+    ("номер карты", incorrect_number_account),
+    ("Счет 7I5830O73472675895", incorrect_number_account),
+])
+
+
+def test_get_mask_wrong_account(account: str, expected: str) -> None:
+    assert get_mask_account(account) == expected
