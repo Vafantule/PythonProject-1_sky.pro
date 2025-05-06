@@ -7,29 +7,29 @@ from src.masks import get_mask_card_number, get_mask_account
 def mask_account_card(string_to_mask: str) -> str:
     """Платеж. система карты либо 'Счет', скрытие символов номера. Функция"""
     ### Честно спизженый код у другого студента.
-    # if card := re.search(r"(\s\d{16}$)", string_to_mask):
-    #     return (f"{string_to_mask[:card.start()]} "
-    #             f"{get_mask_card_number(string_to_mask.group()[1:])}"
-    #             )
-    # elif account := re.search(r"(\s\d{20}$)", string_to_mask):
-    #     return (f"{string_to_mask[:account.start()]} "
-    #             f"{get_mask_account(string_to_mask.group()[1:])}"
-    #             )
-    # else:
-    #     return "Номер некорректный"
+    if card := re.search(r"(\s\d{16}$)", string_to_mask):
+        return (f"{string_to_mask[:card.start()]} "
+                f"{get_mask_card_number(card.group()[1:])}"
+                )
+    elif account := re.search(r"(\s\d{20}$)", string_to_mask):
+        return (f"{string_to_mask[:account.start()]} "
+                f"{get_mask_account(account.group()[1:])}"
+                )
+    else:
+        return "Номер некорректный"
 
 
     # # Если ввод только номера
-    if string.isdigit():
-        return get_mask_card_number(string)
-    # Если в строке содержится "Счет", формирование строки по формату
-    elif "Счет" in string:
-        account_number = string[-20:]
-        return string[:5] + get_mask_account(account_number)
-    # Если в строке содержится Платеж. система, формирование строки по формату
-    else:
-        card_number = " ".join(string[-16:].split())
-        return string[:-16] + get_mask_card_number(card_number)
+    # if string_to_mask.isdigit():
+    #     return get_mask_card_number(string_to_mask)
+    # # Если в строке содержится "Счет", формирование строки по формату
+    # elif "Счет" in string_to_mask:
+    #     account_number = string_to_mask[-20:]
+    #     return string_to_mask[:5] + get_mask_account(account_number)
+    # # Если в строке содержится Платеж. система, формирование строки по формату
+    # else:
+    #     card_number = " ".join(string_to_mask[-16:].split())
+    #     return string_to_mask[:-16] + get_mask_card_number(card_number)
 
 
 if __name__ == "__main__":
