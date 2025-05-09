@@ -103,3 +103,17 @@ def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -
 # usd_transactions = filter_by_currency(transactions, "USD")
 # for _ in range(3):
 #     print(next(usd_transactions))
+
+
+def transaction_descriptions(transactions: List[Dict[str, Any]]) -> Generator[Any | None, Any, None]:
+    """
+    Вывод описания операций по транзакциям. Функция.
+    :param transactions: Данные для отбора.
+    :return:
+    """
+    first_step = (transaction.setdefault("description") for transaction in transactions)
+    return first_step
+
+# descriptions = transaction_descriptions(transactions)
+# for _ in range(2):
+#     print(next(descriptions))
