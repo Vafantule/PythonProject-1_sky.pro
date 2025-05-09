@@ -1,6 +1,29 @@
 import pytest
 
-from src.generators import filter_by_currency, transactions, card_number_generator
+from typing import Any, Dict, List
+from src.generators import filter_by_currency, card_number_generator
+
+
+# Блок тестирование функции отбора по валюте.
+@pytest.mark.parametrize("currency_code, expected", [
+    ("USD", 3),
+    ("RUB", 2),
+    ("EUR", 0)
+])
+def test_filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str, expected: str) -> None:
+    assert len(list(filter_by_currency(transactions, currency_code))) == expected
+    for transaction in list(filter_by_currency(transactions, currency_code)):
+        assert transaction.setdefault("operationAmount").get("currency").get("code") == currency_code
+
+
+def test_filter_by_currency_empty_list():
+    assert list(filter_by_currency([], "USD")) == []
+
+
+def test_filter_by_currency_no_currency(transactions: List[Dict[str, Any]]) -> None:
+    assert list(filter_by_currency(transactions, "EUR")) == []
+
+
 
 # Блок тестирование функции генерации номера карты.
 @pytest.mark.parametrize("start, end, expected", [
