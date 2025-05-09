@@ -99,7 +99,7 @@ def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -
             yield transaction
 
 
-    #Получить итератор для транзакций в валюте.
+# Получить итератор для транзакций в валюте.
 # usd_transactions = filter_by_currency(transactions, "USD")
 # for _ in range(3):
 #     print(next(usd_transactions))
@@ -117,3 +117,43 @@ def transaction_descriptions(transactions: List[Dict[str, Any]]) -> Generator[An
 # descriptions = transaction_descriptions(transactions)
 # for _ in range(2):
 #     print(next(descriptions))
+
+
+def luna_check(card_number: str) -> bool:
+    """
+    Проверка номера карты по алгоритму Ханса Луна. Функция.
+    :param card_number: Номер карты для анализа.
+    :return: Итоговый результат.
+    """
+    # Номер карты в цифры.
+    digits = [int(digit) for digit in card_number]
+    checksum = 0
+    # Формула Луна.
+    reverse_digits = digits[::-1]
+    for index, digit in enumerate(reverse_digits):
+        if index % 2 == 1:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        checksum += digit
+    return checksum % 10 == 0
+
+
+def card_number_generator(start: int, end: int) -> Generator[str, Any, None]:
+    """
+    Генерация номера банковской карты 16 символов. Функция.
+    :param start: Начальное значение номера карты.
+    :param end: Конечное значение номера карты.
+    :return: Отформатированный вывод номера карты.
+    """
+    for number in range(start, end + 1):
+        card_number = f"{number:016}"
+    # if luna_check(card_number):
+        formatted_card_number = (f"{card_number[0:4]} {card_number[4:8]} "
+                                 f"{card_number[8:12]} {card_number[12:16]}")
+        yield formatted_card_number
+
+
+# Вывод номера карты в выбранном диапазоне.
+# for card_number in card_number_generator(1, 5):
+#     print(card_number)
