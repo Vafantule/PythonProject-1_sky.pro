@@ -1,8 +1,8 @@
 import pytest
 import re
 
-from typing import Any, Dict, List
-from src.generators import filter_by_currency, card_number_generator
+from typing import Any, Dict, List, Optional, Iterator
+from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
 
 # Блок тестирование функции отбора по валюте.
@@ -26,7 +26,74 @@ def test_filter_by_currency_no_currency(transactions: List[Dict[str, Any]]) -> N
 
 
 # Блок тестирование функции вывода описания операций.
+def test_transaction_descriptions(description_sample: List[Dict[str, Optional[Any]]]) -> None:
+    """
+    Тестирование функции с заданными фикстурами.
+    :param description_sample:
+    :assert:
+    """
+    result = list(transaction_descriptions(description_sample))
+    expected = [
+        "Перевод организации",
+        "Нет необходимого словаря.",
+        "Нет необходимого словаря.",
+        "Перевод с карты на карту",
+        "Нет необходимого словаря.",
+        "Нет необходимого словаря.",
+        "Нет необходимого словаря.",
+    ]
+    assert result == expected
 
+
+@pytest.mark.parametrize("description, expected", [
+([{"description": "Тест"}], ["Тест"]),
+        ([{"description": ""}], ["Нет необходимого словаря."]),
+        ([{}], ["Нет необходимого словаря."]),
+        ([], []),
+        ([{"description": 123}], ["Нет необходимого словаря."]),
+        ([{"description": None}], ["Нет необходимого словаря."]),
+        ([{"description": ["test"]}], ["Нет необходимого словаря."]),
+        ([{"description": "Первый"},
+          "not a dict", {"description": ""}],
+         ["Первый", "Нет необходимого словаря."]),
+        (
+            [
+                {"description": "Первый"},
+                {"description": ""},
+                {},
+                {"description": 123},
+                {"description": None},
+                "not a dict",
+                {"description": "Последний"},
+            ],
+            [
+                "Первый",
+                "Нет необходимого словаря.",
+                "Нет необходимого словаря.",
+                "Нет необходимого словаря.",
+                "Нет необходимого словаря.",
+                "Последний",
+            ],
+        ),
+])
+def test_transaction_descriptions_with_parameterize(description: List[Dict[str, Optional[Any]]],
+                                                    expected: List[str]) -> None:
+    """
+    Тестирование функции с параметризацией.
+    :param description: Вводный словарь для тестирования.
+    :param expected: Ожидаемый результат.
+    :assert:
+    """
+    assert list(transaction_descriptions(description)) == expected
+
+
+def test_transaction_descriptions_iterator_type(description_sample: List[Dict[str, Optional[Any]]]) -> None:
+    """
+    Тестирование функции на соответствие типов.
+    :param description_sample: Фикстуры.
+    :assert:
+    """
+    assert isinstance(transaction_descriptions(description_sample), Iterator)
 
 
 # Блок тестирование функции генерации номера карты.
@@ -101,7 +168,7 @@ def test_card_number_generator_start_greater_than_end():
         list(card_number_generator(10, 5))
 
 
-def test_card_number_generator_maximum():
+def test_card_number_generator_maximum() -> None:
     """
     Тестирование генератора, на выходящий за границы индекс. Функция теста.
     :return: Возврат сообщения с ошибкой.

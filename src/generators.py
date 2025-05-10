@@ -81,7 +81,8 @@ transactions = (
 )
 
 
-def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -> Generator[dict[str, Any], Any, None]:
+def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -> (
+        Generator)[dict[str, Any], Any, None]:
     """
     Отбор данных по отобранной валюте. Функция.
     :param transactions: Данные для отбора.
@@ -94,7 +95,7 @@ def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -
         raise ValueError("Транзакции должны быть представлены в виде словаря.")
 
     for transaction in transactions:
-        currency = transaction.setdefault("operationAmount").get("currency").get("code")
+        currency = transaction.setdefault("operationAmount", {}).setdefault("currency", {}).setdefault("code")
         if currency == currency_code:
             yield transaction
 
