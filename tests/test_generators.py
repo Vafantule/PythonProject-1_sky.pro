@@ -1,4 +1,5 @@
 import pytest
+import re
 
 from typing import Any, Dict, List
 from src.generators import filter_by_currency, card_number_generator
@@ -24,6 +25,9 @@ def test_filter_by_currency_no_currency(transactions: List[Dict[str, Any]]) -> N
     assert list(filter_by_currency(transactions, "EUR")) == []
 
 
+# Блок тестирование функции вывода описания операций.
+
+
 
 # Блок тестирование функции генерации номера карты.
 @pytest.mark.parametrize("start, end, expected", [
@@ -32,20 +36,20 @@ def test_filter_by_currency_no_currency(transactions: List[Dict[str, Any]]) -> N
         "0000 0000 0000 0002",
         "0000 0000 0000 0003",
         "0000 0000 0000 0004"
-    ])
+    ]),
+    (9999999999999998, 9999999999999999, [
+        "9999 9999 9999 9998", "9999 9999 9999 9999"]),
 ])
 def test_card_number_generator(start: int, end: int, expected: int) -> None:
-    assert list(card_number_generator(start, end)) == expected
-
-
-def test_card_number_generator_empty(empty_range: int) -> None:
     """
-    Тестирование пустого диапазона номера карт. Функция теста.
-    :param empty_range: Пустой диапазон карт.
+    Тестирование генератора на правильное формирование номера. Функция теста.
+    :param start: Начальное значение.
+    :param end: Конечное значение.
+    :param expected: Ожидаемый номер карты.
     :assert:
     """
-    start, end = empty_range
-    assert list(card_number_generator(start, end)) == []
+    result = list(card_number_generator(start, end))
+    assert result == expected, f"Ожидались номера {expected}, получено {result}"
 
 
 def test_card_number_generator_format(small_range: int) -> None:
@@ -56,9 +60,71 @@ def test_card_number_generator_format(small_range: int) -> None:
     """
     start, end = small_range
     for card_number in card_number_generator(start, end):
-        assert len(card_number) == 19
+        assert len(card_number) == 19   # Общая длина номера.
         assert card_number.count(" ") == 3
         assert card_number.replace(" ", "").isdigit()
+
+
+def test_card_number_generator_edge_cases():
+    """
+    Тестирование генератора проверки начального либо конечного номера. Функция теста.
+    :assert:
+    """
+    # Минимальный диапазон
+    result = list(card_number_generator(0, 0))
+    assert result == ["0000 0000 0000 0000"], "Ошибка при генерации минимального номера"
+
+    # Максимальный диапазон
+    result = list(card_number_generator(9999999999999999, 9999999999999999))
+    assert result == ["9999 9999 9999 9999"], "Ошибка при генерации максимального номера"
+
+    # Одно значение
+    result = list(card_number_generator(1, 1))
+    assert result == ["0000 0000 0000 0001"], "Ошибка при генерации одного номера"
+
+
+def test_card_number_generator_negative_start():
+    """
+    Тестирование генератора, при значении start меньше 0. Функция теста.
+    :return: Возврат сообщения с ошибкой.
+    """
+    with pytest.raises(ValueError, match="Начальное число не может быть меньше или равно 0"):
+        list(card_number_generator(-1, 10))
+
+
+def test_card_number_generator_start_greater_than_end():
+    """
+    Тестирование генератора, при значении start меньше end. Функция теста.
+    :return: Возврат сообщения с ошибкой.
+    """
+    with pytest.raises(ValueError, match="Начальный номер должен быть меньше или равен конечному"):
+        list(card_number_generator(10, 5))
+
+
+def test_card_number_generator_maximum():
+    """
+    Тестирование генератора, на выходящий за границы индекс. Функция теста.
+    :return: Возврат сообщения с ошибкой.
+    """
+    with pytest.raises(ValueError, match="Номера карт должны быть в диапазоне от 0 до 9999999999999999"):
+        list(card_number_generator(10000000000000000, 10000000000000001))
+
+
+@pytest.mark.parametrize("start, end", [
+    (0, 5),
+    (1000, 1005),
+    (9999999999999990, 9999999999999995),
+])
+def test_complete_generation(start: int, end: int) -> None:
+    """
+    Тестирование генерации номеров в диапазоне. Функция теста.
+    :param start: Начальное значение.
+    :param end: Конечное значение.
+    :assert:
+    """
+    result = list(card_number_generator(start, end))
+    expected_count = end - start + 1
+    assert len(result) == expected_count, f"Ожидалось {expected_count} номеров, получено {len(result)}"
 
 
 def test_card_number_generator_range(large_range: int) -> None:
