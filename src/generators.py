@@ -132,32 +132,12 @@ def transaction_descriptions(transactions: List[Dict[str, Optional[Any]]]) -> It
 
 descriptions = transaction_descriptions(transactions)
 # while True:
-try:
-    for _ in range(9):
-        print(next(descriptions))
-except StopIteration:
-    print("Окончание итерации.")
+# try:
+#     for _ in range(9):
+#         print(next(descriptions))
+# except StopIteration:
+#     print("Окончание итерации.")
     # break
-
-
-def luna_check(card_number: str) -> bool:
-    """
-    Проверка номера карты по алгоритму Ханса Луна. Функция.
-    :param card_number: Номер карты для анализа.
-    :return: Итоговый результат.
-    """
-    # Номер карты в цифры.
-    digits = [int(digit) for digit in card_number]
-    checksum = 0
-    # Формула Луна.
-    reverse_digits = digits[::-1]
-    for index, digit in enumerate(reverse_digits):
-        if index % 2 == 1:
-            digit *= 2
-            if digit > 9:
-                digit -= 9
-        checksum += digit
-    return checksum % 10 == 0
 
 
 def card_number_generator(start: int, end: int) -> Generator[str, Any, None]:
