@@ -3,23 +3,36 @@ import pytest
 from src.masks import get_mask_account, get_mask_card_number
 
 # Блок тестирования номера карты.
-incorrect_number_card = "Номер карты не корректный. Просьба вводить только !! 16 !! цифр."
+
+# Тест с использованием фикстуры
+def test_valid_card_numbers_with_fixture(valid_card_numbers):
+    for input_number, expected in valid_card_numbers:
+        assert get_mask_card_number(input_number) == expected
 
 
-def test_get_mask_card_number(card_number: str) -> None:
-    assert get_mask_card_number(card_number) == "4608 83** **** 5199"
-
-
-@pytest.mark.parametrize("card, expected", [
-    ("", incorrect_number_card),
-    ("80123456", incorrect_number_card),
-    ("59994142284263530123", incorrect_number_card),
-    ("8990-9221-1366-5229", incorrect_number_card),
-    ("Карта 6831982476737658", incorrect_number_card),
-    ("номер карты", incorrect_number_card),
+# Тест для корректных номеров с параметризацией
+@pytest.mark.parametrize("input_number, expected", [
+    ("123456789012", "123 4** *** 012"),  # 12 символов
+    ("7000792289606361", "7000 79** **** 6361"),  # 16 символов
+    ("1234567890123456789", "1234 56** ******* 6789"),  # 19 символов
+    ("123-456-789 012", "123 4** *** 012"),  # С пробелами и дефисами
+    ("7000-7922-abc-6361", "700 0** *** 361"),  # С буквами
+    ("1234!5678@9012#3456$789", "1234 56** ******* 6789"),  # Со спецсимволами
 ])
-def test_get_mask_card_wrong_number(card: str, expected: str) -> None:
-    assert get_mask_card_number(card) == expected
+def test_valid_card_numbers(input_number, expected):
+    assert get_mask_card_number(input_number) == expected
+
+
+# Тест для некорректных номеров с параметризацией
+@pytest.mark.parametrize("input_number", [
+    "123456789",  # Слишком короткий (9 символов)
+    "12345678901234567890",  # Слишком длинный (20 символов)
+    "abc-xyz",  # Только буквы (0 символов после очистки)
+    "",  # Пустая строка
+])
+def test_invalid_card_numbers(input_number):
+    with pytest.raises(ValueError, match="Ошибка: Длина номера карты должна быть от 12 до 19 символов."):
+        get_mask_card_number(input_number)
 
 
 # Блок тестирования номера счета.
