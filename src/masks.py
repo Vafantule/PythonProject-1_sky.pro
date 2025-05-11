@@ -2,51 +2,30 @@ import re
 
 
 def get_mask_card_number(user_card_number_input: str) -> str:
-    # Удаление возможных пробелов
-    # user_card_number = user_card_number_input.split()[-1][:16]
-    # user_card_number = str(user_card_number_input)
-
-    # Проверка на пустые строки
-    # if not user_card_number.strip():
-    #     raise ValueError("Не введен номер карты")
-
-    # Проверка, что номер карты состоит только из цифр
-    # if not user_card_number.isdigit():
-    #     raise ValueError("Номер карты должен содержать только цифры")
-
-    # Подстановка "*" вместо цифр, кроме первых_6, последних_4
-    # private_card_number = (
-    #     user_card_number[:6]
-    #     + (len(user_card_number[6:-4]) * "*")
-    #     + user_card_number[-4:]
-    # )
-    #
-    # # Группировка строки по 4 секции?
-    #
-    # chunks, chunks_size = (
-    #     len(private_card_number),
-    #     len(private_card_number) // 4
-    # )
-    #
-    # return " ".join(
-    #         [
-    #             private_card_number[index : index + chunks_size] \
-    #             for index in range(0, chunks, chunks_size)
-    #         ]
-    #     )
-
-
     """
     Функция скрытия части вводимого номера карты.
     :param user_card_number_input: Вводимый номер карты.
     :return: Вывод отформатированной строки номера карты.
     """
-    if re.match(r"\d{16}$", user_card_number_input):
-        return (f"{user_card_number_input[0:4]} "
-                f"{user_card_number_input[4:6]}** **** "
-                f"{user_card_number_input[12:16]}")
+    # Преобразуем число в строку и удаляем пробелы.
+    # card_str = str(user_card_number_input).replace(" ", "")
+    card_str = re.sub(r'\D', '', str(user_card_number_input))
+
+    # Проверка, что строка состоит только из цифр и длина с выбросом исключения
+    if not ((12 <= len(card_str) <= 19) and card_str.isdigit()):
+        raise ValueError("Ошибка: Длина номера карты должна быть от 12 до 19 символов.")
+
+    # Для 12 символов: XXX X** *** XXX
+    if len(card_str) == 12:
+        masked = f"{card_str[:3]}{card_str[3]}**{card_str[-3:]}"
+        formatted = f"{masked[:3]} {masked[3:6]} *** {masked[-3:]}"
     else:
-        return "Номер карты не корректный. Просьба вводить только !! 16 !! цифр."
+        # Для 13–19 символов: XXXX XX** **** XXXX
+        stars_count = len(card_str) - 10  # Звездочки для середины
+        masked = card_str[:6] + "*" * stars_count + card_str[-4:]
+        formatted = f"{masked[:4]} {masked[4:6]}** {'*' * (stars_count - 2)} {masked[-4:]}"
+
+    return formatted
 
 
 # if __name__ == "__main__":
@@ -54,7 +33,7 @@ def get_mask_card_number(user_card_number_input: str) -> str:
 
 
 def get_mask_account(user_account_number_input: str) -> str:
-        # Удаление возможных пробелов
+    # Удаление возможных пробелов
     # user_account_number = user_account_number_input[:20].replace(' ', '')
     #
     # # Подстановка "*" вместо цифр, кроме последних_4
