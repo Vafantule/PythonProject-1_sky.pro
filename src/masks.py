@@ -32,24 +32,28 @@ def get_mask_card_number(user_card_number_input: str) -> str:
     print(get_mask_card_number(input("Ввод номера карты: ")))
 
 
+# Функция для маскировки номера счета
 def get_mask_account(user_account_number_input: str) -> str:
-    # Удаление возможных пробелов
-    # user_account_number = user_account_number_input[:20].replace(' ', '')
-    #
-    # # Подстановка "*" вместо цифр, кроме последних_4
-    # private_account_number = "*" * len(user_account_number[-2:]) + user_account_number[-4:]
-    # return private_account_number
-
     """
-    Функция отображения последних 4 символов номера счета.
+    Функция отображения '**' + последние 4 символов номера счета.
     :param user_account_number_input: Вводимый номер счета.
     :return: Вывод отформатированной строки номера счета.
     """
+    # Удаляем все нецифровые символы
+    digits = ""
+    for char in user_account_number_input:
+        if char.isdigit():
+            digits += char
 
-    if re.match(r"\d{20}$", user_account_number_input):
-        return f"**{user_account_number_input[-4:]}"
-    else:
-        return "Номер счета не корректный. Просьба вводить только !! 20 !! цифр."
+    # Проверяем длину
+    if len(digits) != 20:
+        raise ValueError(
+            f"Номер счета должен содержать ровно 20 цифр, но содержит: {len(digits)}. "
+            f"Входное значение: {digits if digits else 'пустая строка'}")
+
+    # Создаем маску: ** + последние 4 цифры
+    masked = "**" + digits[-4:]
+    return masked
 
 
 # if __name__ == "__main__":
