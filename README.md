@@ -44,7 +44,56 @@ executed_transactions = filter_by_state(transactions)
 # Сортировка операций по дате в порядке убывания
 sorted_transactions = sort_by_date(transactions)
 ```
+## Модуль generators
 
+Модуль предоставляет функции для работы с банковскими операциями:
+
+- `filter_by_currency`: выдает транзакции по заданной валюте.
+- `transaction_descriptions`: выводит описание каждой операции по очереди.
+- `card_number_generator`: генерирует диапазон банковских карт.
+
+### Примеры использования:
+
+```aiignore
+
+
+Функция `transaction_descriptions` находится в файле generators.py. Пример использования:
+
+from transaction_descriptions import transaction_descriptions
+
+transactions = [
+    {"description": "Перевод организации"},
+    {"description": ""},
+    {},
+    {"description": 123},
+    "not a dict"
+]
+
+for desc in transaction_descriptions(transactions):
+    print(desc)
+
+Вывод:
+
+Перевод организации
+Нет необходимого словаря.
+Нет необходимого словаря.
+Нет необходимого словаря.
+```
+
+### Запуск тестов для проверки стабильности кода:
+```
+Тестирование
+
+Тесты находятся в файле test_generators.py и используют pytest.
+
+Для запуска тестов:
+
+Убедитесь, что оба файла (generators.py и test_generators.py) находятся в одной директории.
+
+Выполните команду:
+
+pytest test_transaction_descriptions.py -v
+```
 
 ## Документация:
 

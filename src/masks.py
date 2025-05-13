@@ -1,41 +1,60 @@
-# import re
+import re
 
 
 def get_mask_card_number(user_card_number_input: str) -> str:
-    """Функция скрытия части вводимого номера карты."""
-    # Удаление возможных пробелов
-    user_card_number = (user_card_number_input[:16].replace(" ", ""))
+    """
+    Функция скрытия части вводимого номера карты.
+    :param user_card_number_input: Вводимый номер карты.
+    :return: Вывод отформатированной строки номера карты.
+    """
+    # Преобразуем число в строку и удаляем пробелы.
+    # card_str = str(user_card_number_input).replace(" ", "")
+    card_str = re.sub(r'\D', '', str(user_card_number_input))
 
-    # Подстановка "*" вместо цифр, кроме первых_6, последних_4
-    private_card_number = (
-        user_card_number[:6]
-        + (len(user_card_number[6:-4]) * "*")
-        + user_card_number[-4:]
-    )
+    # Проверка, что строка состоит только из цифр и длина с выбросом исключения
+    if not ((12 <= len(card_str) <= 19) and card_str.isdigit()):
+        raise ValueError("Ошибка: Длина номера карты должна быть от 12 до 19 символов.")
 
-    # Группировка строки по 4 секции?
-    chunks, chunks_size = (
-        len(private_card_number),
-        len(private_card_number) // 4,
-    )
+    # Для 12 символов: XXX X** *** XXX
+    if len(card_str) == 12:
+        masked = f"{card_str[:3]}{card_str[3]}**{card_str[-3:]}"
+        formatted = f"{masked[:3]} {masked[3:6]} *** {masked[-3:]}"
+    else:
+        # Для 13–19 символов: XXXX XX** **** XXXX
+        stars_count = len(card_str) - 10  # Звездочки для середины
+        masked = card_str[:6] + "*" * stars_count + card_str[-4:]
+        formatted = f"{masked[:4]} {masked[4:6]}** {'*' * (stars_count - 2)} {masked[-4:]}"
 
-    return " ".join(
-        [
-            private_card_number[i : i + chunks_size]
-            for i in range(0, chunks, chunks_size)
-        ]
-    )
-
-# print(get_mask_card_number(input("Ввод номера карты: ")))
+    return formatted
 
 
+# if __name__ == "__main__":
+    print(get_mask_card_number(input("Ввод номера карты: ")))
+
+
+# Функция для маскировки номера счета
 def get_mask_account(user_account_number_input: str) -> str:
-    """Функция отображения последних 4 символов номера счета."""
-    # Удаление возможных пробелов
-    user_account_number = user_account_number_input[:20].replace(' ', '')
+    """
+    Функция отображения '**' + последние 4 символов номера счета.
+    :param user_account_number_input: Вводимый номер счета.
+    :return: Вывод отформатированной строки номера счета.
+    """
+    # Удаляем все нецифровые символы
+    digits = ""
+    for char in user_account_number_input:
+        if char.isdigit():
+            digits += char
 
-    # Подстановка "*" вместо цифр, кроме последних_4
-    private_account_number = "*" * len(user_account_number[-2:]) + user_account_number[-4:]
-    return private_account_number
+    # Проверяем длину
+    if len(digits) != 20:
+        raise ValueError(
+            f"Номер счета должен содержать ровно 20 цифр, но содержит: {len(digits)}. "
+            f"Входное значение: {digits if digits else 'пустая строка'}")
 
-# print(get_mask_account(input("Ввод номера счета: ")))
+    # Создаем маску: ** + последние 4 цифры
+    masked = "**" + digits[-4:]
+    return masked
+
+
+# if __name__ == "__main__":
+    print(get_mask_account(input("Ввод номера счета: ")))
