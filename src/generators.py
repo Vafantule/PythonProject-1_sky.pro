@@ -95,7 +95,9 @@ def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -
         raise ValueError("Транзакции должны быть представлены в виде словаря.")
 
     for transaction in transactions:
-        currency = transaction.setdefault("operationAmount", {}).setdefault("currency", {}).setdefault("code")
+        currency = transaction.setdefault("operationAmount",
+                                          {}).setdefault("currency",
+                                                         {}).setdefault("code")
         if currency == currency_code:
             yield transaction
 
