@@ -1,7 +1,8 @@
 import pytest
-import re
+# import re
 
 from typing import Any, Dict, List, Optional, Iterator
+
 from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
 
@@ -11,13 +12,17 @@ from src.generators import filter_by_currency, transaction_descriptions, card_nu
     ("RUB", 2),
     ("EUR", 0)
 ])
-def test_filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str, expected: str) -> None:
+def test_filter_by_currency(transactions: List[Dict[str, Any]],
+                            currency_code: str,
+                            expected: str) -> None:
     assert len(list(filter_by_currency(transactions, currency_code))) == expected
     for transaction in list(filter_by_currency(transactions, currency_code)):
-        assert transaction.setdefault("operationAmount").get("currency").get("code") == currency_code
+        assert transaction.setdefault("operationAmount",
+                                      {}).setdefault("currency",
+                                                     {}).setdefault("code") == currency_code
 
 
-def test_filter_by_currency_empty_list():
+def test_filter_by_currency_empty_list() -> None:
     assert list(filter_by_currency([], "USD")) == []
 
 
@@ -46,35 +51,34 @@ def test_transaction_descriptions(description_sample: List[Dict[str, Optional[An
 
 
 @pytest.mark.parametrize("description, expected", [
-([{"description": "Тест"}], ["Тест"]),
-        ([{"description": ""}], ["Нет необходимого словаря."]),
-        ([{}], ["Нет необходимого словаря."]),
-        ([], []),
-        ([{"description": 123}], ["Нет необходимого словаря."]),
-        ([{"description": None}], ["Нет необходимого словаря."]),
-        ([{"description": ["test"]}], ["Нет необходимого словаря."]),
-        ([{"description": "Первый"},
-          "not a dict", {"description": ""}],
-         ["Первый", "Нет необходимого словаря."]),
-        (
-            [
-                {"description": "Первый"},
-                {"description": ""},
-                {},
-                {"description": 123},
-                {"description": None},
-                "not a dict",
-                {"description": "Последний"},
-            ],
-            [
-                "Первый",
-                "Нет необходимого словаря.",
-                "Нет необходимого словаря.",
-                "Нет необходимого словаря.",
-                "Нет необходимого словаря.",
-                "Последний",
-            ],
-        ),
+    ([{"description": "Тест"}], ["Тест"]),
+    ([{"description": ""}], ["Нет необходимого словаря."]),
+    ([{}], ["Нет необходимого словаря."]),
+    ([], []),
+    ([{"description": 123}], ["Нет необходимого словаря."]),
+    ([{"description": None}], ["Нет необходимого словаря."]),
+    ([{"description": ["test"]}], ["Нет необходимого словаря."]),
+    ([{"description": "Первый"}, "not a dict",
+        {"description": ""}], ["Первый", "Нет необходимого словаря."]),
+    (
+        [
+            {"description": "Начало"},
+            {"description": ""},
+            {},
+            {"description": 123},
+            {"description": None},
+            "not a dict",
+            {"description": "Окончание"},
+        ],
+        [
+            "Начало",
+            "Нет необходимого словаря.",
+            "Нет необходимого словаря.",
+            "Нет необходимого словаря.",
+            "Нет необходимого словаря.",
+            "Окончание",
+        ],
+    ),
 ])
 def test_transaction_descriptions_with_parameterize(description: List[Dict[str, Optional[Any]]],
                                                     expected: List[str]) -> None:
@@ -119,7 +123,7 @@ def test_card_number_generator(start: int, end: int, expected: int) -> None:
     assert result == expected, f"Ожидались номера {expected}, получено {result}"
 
 
-def test_card_number_generator_format(small_range: int) -> None:
+def test_card_number_generator_format(small_range: tuple[int, int]) -> None:
     """
     Тестирование, что итоговый номер карты имеет корректный формат. Функция теста.
     :param small_range: Диапазон карт.
@@ -132,7 +136,7 @@ def test_card_number_generator_format(small_range: int) -> None:
         assert card_number.replace(" ", "").isdigit()
 
 
-def test_card_number_generator_edge_cases():
+def test_card_number_generator_edge_cases() -> None:
     """
     Тестирование генератора проверки начального либо конечного номера. Функция теста.
     :assert:
@@ -150,7 +154,7 @@ def test_card_number_generator_edge_cases():
     assert result == ["0000 0000 0000 0001"], "Ошибка при генерации одного номера"
 
 
-def test_card_number_generator_negative_start():
+def test_card_number_generator_negative_start() -> None:
     """
     Тестирование генератора, при значении start меньше 0. Функция теста.
     :return: Возврат сообщения с ошибкой.
@@ -159,7 +163,7 @@ def test_card_number_generator_negative_start():
         list(card_number_generator(-1, 10))
 
 
-def test_card_number_generator_start_greater_than_end():
+def test_card_number_generator_start_greater_than_end() -> None:
     """
     Тестирование генератора, при значении start меньше end. Функция теста.
     :return: Возврат сообщения с ошибкой.
@@ -194,7 +198,7 @@ def test_complete_generation(start: int, end: int) -> None:
     assert len(result) == expected_count, f"Ожидалось {expected_count} номеров, получено {len(result)}"
 
 
-def test_card_number_generator_range(large_range: int) -> None:
+def test_card_number_generator_range(large_range: tuple[int, int]) -> None:
     """
     Тестирование производительности с большим набором номеров карт. Функция теста.
     :param large_range: Диапазон карт.
