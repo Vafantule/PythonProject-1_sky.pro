@@ -46,17 +46,17 @@ def description_sample():
 
 # Блок фикстур для тестов 'card_number_generator'
 @pytest.fixture
-def small_range():
+def small_range() -> tuple[int, int]:
     return 1, 10
 
 
 @pytest.fixture
-def large_range():
+def large_range() -> tuple[int, int]:
     return 1, 1000
 
 
 @pytest.fixture
-def empty_range():
+def empty_range() -> tuple[int, int]:
     return 100, 99
 
 
