@@ -1,14 +1,15 @@
 import functools
 import os
 from datetime import datetime
-from typing import TypeVar, Callable, Optional
+from typing import Callable, Optional, TypeVar, Any
 
-variable_type_t  = TypeVar('variable_type_t')
+VARIABLE_TYPE = TypeVar('VARIABLE_TYPE')
+MAX_ATTEMPTS = 1000
+
 
 def write_log_to_file(log_message: str, filename: str) -> None:
     """
-    Записывает лог в файл mylog_%n%
-    .txt при ошибке.
+    Записывает лог в файл mylog_%n%.txt при ошибке.
     :param log_message: Сообщение с выводимыми данными.
     :param filename: Файл для записи сообщений о выполнении работы.
     :return:
@@ -22,8 +23,8 @@ def write_log_to_file(log_message: str, filename: str) -> None:
 
         # Пробуем создать новый файл mylog_n.txt
         number = 1
-        while True:
-            new_filename = f"mylog_{number}.txt"
+        while number <= MAX_ATTEMPTS:
+            new_filename = os.path.join(os.path.dirname(filename), f"mylog_{number}.txt")
             if not os.path.exists(new_filename):
                 try:
                     with open(new_filename, "a", encoding="utf-8") as file:
@@ -33,10 +34,12 @@ def write_log_to_file(log_message: str, filename: str) -> None:
                     number += 1
                     continue
             number += 1
+        if number > MAX_ATTEMPTS:
+            raise RuntimeError(f"Ошибка записи в mylog_n.txt после {MAX_ATTEMPTS} попыток.")
 
 
 def log(filename: Optional[str] = None) -> (
-        Callable)[[Callable[..., variable_type_t]], Callable[..., variable_type_t]]:
+        Callable)[[Callable[..., VARIABLE_TYPE]], Callable[..., VARIABLE_TYPE]]:
     """
     Декоратор, который выводит выполнение функции
     в файл (если указан filename)
@@ -44,15 +47,15 @@ def log(filename: Optional[str] = None) -> (
     :param filename: Файл с событиями при вызове функции.
     :return:
     """
-    def decorator(function_log: Callable[..., variable_type_t]) -> (
-            Callable)[..., variable_type_t]:
+    def decorator(function_log: Callable[..., VARIABLE_TYPE]) -> (
+            Callable)[..., VARIABLE_TYPE]:
         """
         Оборачивание выполнения функции создания логирования.
         :param function_log:
         :return:
         """
         @functools.wraps(function_log)
-        def wrapper(*args: any, **kwargs: any) -> variable_type_t:
+        def wrapper(*args: Any, **kwargs: Any) -> VARIABLE_TYPE:
             """
             Запись данных в лог-файл. Функция.
             :param args, kwargs: Аргументы, передаваемые в декорируемую функцию.
@@ -90,12 +93,12 @@ def log(filename: Optional[str] = None) -> (
 
 # Пример использования при указанном файле mylog.txt либо нет.
 @log(filename=None)
-def function_for_test_log(a: any, b: any) -> any:
+def function_for_test_log(a: Any, b: Any) -> Any:
     return a + b
 
 
 @log(filename="mylog.txt")
-def faulty_function_for_test_log(x: any) -> any:
+def faulty_function_for_test_log(x: Any) -> Any:
     return x / 0
 
 
