@@ -1,3 +1,9 @@
+import builtins
+import os
+import tempfile
+from typing import Callable, Any, Generator
+from unittest.mock import patch, MagicMock
+
 import pytest
 
 
@@ -139,3 +145,48 @@ def transactions():
             "to": "Счет 14211924144426031657"
         }
     ]
+
+
+@pytest.fixture
+def temp_file() -> Generator[str, Any, None]:
+    """
+    Создание и удаление временных файлов для тестирования функций.
+    :return:
+    """
+    temp = tempfile.NamedTemporaryFile(delete=False, mode="w", encoding="utf-8")
+    temp.close()
+
+    temp_dir = os.path.dirname(temp.name)
+    for number in range(1, 100):
+        file_path = os.path.join(temp_dir, f"mylog_{number}.txt")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    yield temp.name
+    if os.path.exists(temp.name):
+        os.remove(temp.name)
+    for number in range(1, 100):
+        file_path = os.path.join(temp_dir, f"mylog_{number}.txt")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+
+@pytest.fixture
+def mock_file_error(temp_file: str) -> Callable:
+    """
+    Имитация ошибки записи в файл для temp_file
+    :param temp_file: Временный файл.
+    :return:
+    """
+    def create_mock(error_type: type) -> MagicMock:
+        """
+        Создание имитации ошибки.
+        :param error_type: Тип ошибки.
+        :return:
+        """
+        real_open = builtins.open
+        def mock_open(*args: any, **kwargs: any) -> any:
+            if args and args[0] == temp_file:
+                raise error_type("Ложная ошибка")
+            return real_open(*args, **kwargs)
+        return patch("builtins.open", side_effect=mock_open)
+    return create_mock
