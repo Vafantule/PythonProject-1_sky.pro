@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Any, Callable, Generator, Never, Optional, Union
+from typing import Any, Callable, Generator, Optional, Union
 from unittest.mock import patch
 
 import pytest
@@ -17,7 +17,7 @@ def log_decorators_write_to_temp_file(temp_file: str) -> Generator[None, Any, No
     :return:
     """
     temp_dir = os.path.dirname(temp_file)
-    MAX_ATTEMPTS = 1000
+    # MAX_ATTEMPTS = 1000
 
     def write_log_to_temp_file(log_message: str, filename: str) -> None:
         try:
