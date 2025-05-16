@@ -276,7 +276,7 @@ def test_file_write_high_number(
             file.write("Запись существует.\n")
 
     @log(filename=temp_file)
-    def add(*args: Any, **kwargs: dict[str, Never]) -> int:
+    def add(*args: Any, **kwargs: Any) -> int:
         return sum(args)
 
     with mock_file_error(PermissionError, all_files=False):
