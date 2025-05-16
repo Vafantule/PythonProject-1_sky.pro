@@ -1,8 +1,8 @@
 import builtins
 import os
 import tempfile
-from typing import Callable, Any, Generator
-from unittest.mock import patch, MagicMock
+from typing import Any, Callable, Generator
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -14,7 +14,7 @@ def empty_string() -> str:
 
 # Фикстура для предоставления тестовых данных
 @pytest.fixture
-def valid_card_numbers():
+def valid_card_numbers() -> list:
     return [
         ("123456789012", "123 4** *** 012"),  # 12 символов
         ("7000792289606361", "7000 79** **** 6361"),  # 16 символов
@@ -24,7 +24,7 @@ def valid_card_numbers():
 
 # Фикстура для корректных входных данных
 @pytest.fixture
-def valid_account_numbers():
+def valid_account_numbers() -> list:
     return [
         ("73654108430135874305", "**4305"),
         ("12345678901234567890", "**7890"),
@@ -35,7 +35,7 @@ def valid_account_numbers():
 
 # Блок фикстур для тестов 'transaction_descriptions'
 @pytest.fixture
-def description_sample():
+def description_sample() -> list:
     return [
         {"description": "Перевод организации"},
         {"description": ""},
@@ -67,7 +67,7 @@ def empty_range() -> tuple[int, int]:
 
 
 @pytest.fixture
-def transactions():
+def transactions() -> list:
     return [
         {
             "id": 939719570,
@@ -157,36 +157,41 @@ def temp_file() -> Generator[str, Any, None]:
     temp.close()
 
     temp_dir = os.path.dirname(temp.name)
-    for number in range(1, 100):
-        file_path = os.path.join(temp_dir, f"mylog_{number}.txt")
-        if os.path.exists(file_path):
-            os.remove(file_path)
+    for file in os.listdir(temp_dir):
+        if file.startswith("mylog_") and file.endswith(".txt"):
+            os.remove(os.path.join(temp_dir, file))
+
     yield temp.name
+
     if os.path.exists(temp.name):
         os.remove(temp.name)
-    for number in range(1, 100):
-        file_path = os.path.join(temp_dir, f"mylog_{number}.txt")
-        if os.path.exists(file_path):
-            os.remove(file_path)
+    for file in os.listdir(temp_dir):
+        if file.startswith("mylog_") and file.endswith(".txt"):
+            os.remove(os.path.join(temp_dir, file))
 
 
 @pytest.fixture
-def mock_file_error(temp_file: str) -> Callable:
+def mock_file_error(temp_file: str) -> Callable[[type, bool], MagicMock]:
     """
     Имитация ошибки записи в файл для temp_file
     :param temp_file: Временный файл.
     :return:
     """
-    def create_mock(error_type: type) -> MagicMock:
+    def create_mock(error_type: type, all_files: bool = False) -> MagicMock:
         """
         Создание имитации ошибки.
+        :param all_files:
         :param error_type: Тип ошибки.
         :return:
         """
         real_open = builtins.open
-        def mock_open(*args: any, **kwargs: any) -> any:
-            if args and args[0] == temp_file:
-                raise error_type("Ложная ошибка")
+
+        def mock_open(*args: Any, **kwargs: Any) -> Any:
+            # if args and args[0] == temp_file:
+            if args:
+                if args[0] == temp_file or (all_files and 'mylog_' in
+                                            args[0] and args[0].endswith('.txt')):
+                    raise error_type("Ложная ошибка")
             return real_open(*args, **kwargs)
         return patch("builtins.open", side_effect=mock_open)
     return create_mock
