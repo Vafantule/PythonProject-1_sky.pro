@@ -1,22 +1,23 @@
 import os
 from datetime import datetime
-from typing import Any, Callable, Generator, Optional, Union
+from typing import Any, Callable, Generator, Never, Optional, Union
 from unittest.mock import patch
 
 import pytest
 from _pytest.capture import CaptureFixture
 
-from src.decorators import log
+from src.decorators import MAX_ATTEMPTS, log
 
 
 @pytest.fixture
 def log_decorators_write_to_temp_file(temp_file: str) -> Generator[None, Any, None]:
     """
-
-    :param temp_file:
+    Проверка создания файлов mylog_n.txt в директории temp_file. Фикстура.
+    :param temp_file: Временный файл для проведения тестов.
     :return:
     """
     temp_dir = os.path.dirname(temp_file)
+    MAX_ATTEMPTS = 1000
 
     def write_log_to_temp_file(log_message: str, filename: str) -> None:
         try:
@@ -28,7 +29,7 @@ def log_decorators_write_to_temp_file(temp_file: str) -> Generator[None, Any, No
 
             # Пробуем создать новый файл mylog_n.txt
             number = 1
-            while True:
+            while number <= MAX_ATTEMPTS:
                 new_filename = os.path.join(temp_dir, f"mylog_{number}.txt")
                 print(f"Попытка записи в {new_filename}")
                 if not os.path.exists(new_filename):
@@ -42,36 +43,37 @@ def log_decorators_write_to_temp_file(temp_file: str) -> Generator[None, Any, No
                         number += 1
                         continue
                 number += 1
+            if number > MAX_ATTEMPTS:
+                raise RuntimeError(f"Ошибка записи в mylog_n.txt после {MAX_ATTEMPTS} попыток.")
     with patch("src.decorators.write_log_to_file", write_log_to_temp_file):
         yield
 
 
 @pytest.fixture
-def decorated_function() -> Callable[[Optional[str], str], Callable[..., Any]]:
+def decorated_function() -> Callable[[Optional[str], str], Callable[..., Union[str, None]]]:
     """
-
+    Проверка на различные ошибки в тестах. Фикстура.
     :return:
     """
-    def create_function(filename: Optional[str], function_type: str) -> (
-            Callable)[..., Union[str, None]]:
+    def create_function(filename: Optional[str], function_type: str) -> Callable[..., Union[str, None]]:
         if function_type == "success":
             @log(filename=filename)
-            def test_function_log(*args: tuple[Any, ...], **kwargs: dict[str, Any]) -> str:
+            def test_function_log(*args: Any, **kwargs: Any) -> str:
                 return "success"
             return test_function_log
         elif function_type == "value_error":
             @log(filename=filename)
-            def test_function_log(*args: tuple[Any, ...], **kwargs: dict[str, Any]) -> None:
+            def test_function_log(*args: Any, **kwargs: Any) -> Any:
                 raise ValueError("Тестирование ошибки значения.")
             return test_function_log
         elif function_type == "zero_division_error":
             @log(filename=filename)
-            def test_function_log(*args: tuple[Any, ...], **kwargs: dict[str, Any]) -> None:
+            def test_function_log(*args: Any, **kwargs: Any) -> Any:
                 raise ZeroDivisionError("Тестирование ошибки деления на 0.")
             return test_function_log
         elif function_type == "type_error":
             @log(filename=filename)
-            def test_function_log(*args: tuple[Any, ...], **kwargs: dict[str, Any]) -> None:
+            def test_function_log(*args: Any, **kwargs: Any) -> Any:
                 raise TypeError("Тестирование ошибки типа данных.")
             return test_function_log
         else:
@@ -103,7 +105,7 @@ def test_function_log_execution(
         args_kwargs: tuple
 ) -> None:
     """
-
+    Проверка тестирования функции для разных комбинаций. Тестирование.
     :param temp_file:
     :param capsys:
     :param decorated_function:
@@ -141,45 +143,13 @@ def test_function_log_execution(
         assert log_content == expected_log
 
 
-@pytest.mark.parametrize("error_type", [PermissionError, OSError])
-def test_file_write_error(
-        temp_file: str,
-        capsys: CaptureFixture[str],
-        mock_file_error: Callable,
-        log_decorators_write_to_temp_file: None,
-        # patched_log_decorator: None,
-        error_type: type
-) -> None:
-    """
-
-    :param temp_file:
-    :param capsys:
-    :param mock_file_error:
-    :param log_decorators_write_to_temp_file:
-    :param error_type:
-    :return:
-    """
-    @log(filename=temp_file)
+def test_function_metadata() -> None:
+    """Проверяет сохранение метаданных функции."""
+    @log()
     def add(a: int, b: int) -> int:
         return a + b
 
-    with mock_file_error(error_type):
-        result = add(9, -4)
-        assert result == 5
-        captured = capsys.readouterr()
-        assert f"Ошибка записи в {temp_file}: {error_type.__name__}" in captured.out
-
-    temp_dir = os.path.dirname(temp_file)
-    new_file = os.path.join(temp_dir, "mylog_1.txt")
-    assert os.path.exists(new_file)
-    with open(new_file, "r", encoding="utf-8") as file:
-        log_content = file.read().strip()
-    assert log_content.endswith(". OK.")
-
-    created_files = [file for file in os.listdir(temp_dir) if
-                     file.startswith("mylog_") and file.endswith(".txt")]
-    assert len(created_files) == 1
-    # assert created_files == ["mylog_1.txt"]
+    assert add.__name__ == "add"
 
 
 def test_unt8_encoding(temp_file: str) -> None:
@@ -203,3 +173,157 @@ def test_unt8_encoding(temp_file: str) -> None:
         file.write("Проверка символов кириллицы\n")
     with open(temp_file, "r", encoding="utf-8") as file:
         assert file.read().strip() == "Проверка символов кириллицы"
+
+
+@pytest.mark.parametrize("error_type", [PermissionError, OSError])
+def test_file_write_error(
+        temp_file: str,
+        capsys: CaptureFixture[str],
+        mock_file_error: Callable,
+        log_decorators_write_to_temp_file: None,
+        error_type: type
+) -> None:
+    """
+    Проверка тестов ошибки записи в файл. Тестирование.
+    :param temp_file:
+    :param capsys:
+    :param mock_file_error:
+    :param log_decorators_write_to_temp_file:
+    :param error_type:
+    :return:
+    """
+    @log(filename=temp_file)
+    def add(*args: Any, **kwargs: Any) -> int:
+        return sum(args)
+
+    with mock_file_error(error_type):
+        result = add(9, -4)
+        assert result == 5
+        captured = capsys.readouterr()
+        assert f"Ошибка записи в {temp_file}: {error_type.__name__}" in captured.out
+
+    temp_dir = os.path.dirname(temp_file)
+    new_file = os.path.join(temp_dir, "mylog_1.txt")
+    assert os.path.exists(new_file)
+    with open(new_file, "r", encoding="utf-8") as file:
+        log_content = file.read().strip()
+    assert log_content.endswith(". OK.")
+
+    created_files = [file for file in os.listdir(temp_dir) if
+                     file.startswith("mylog_") and file.endswith(".txt")]
+    assert len(created_files) == 1
+    # assert created_files == ["mylog_1.txt"]
+
+
+def test_file_write_existing_file(
+    temp_file: str,
+    capsys: CaptureFixture[str],
+    mock_file_error: Callable,
+    log_decorators_write_to_temp_file: None,
+) -> None:
+    """
+    Проверяет запись в mylog_2.txt, если mylog_1.txt уже существует.
+    :param temp_file:
+    :param capsys:
+    :param mock_file_error:
+    :param log_decorators_write_to_temp_file:
+    :return:
+    """
+    temp_dir = os.path.dirname(temp_file)
+    existing_file = os.path.join(temp_dir, "mylog_1.txt")
+    with open(existing_file, 'w', encoding='utf-8') as file:
+        file.write("Запись существует.\n")
+
+    @log(filename=temp_file)
+    def add(*args: Any, **kwargs: Any) -> int:
+        return sum(args)
+
+    with mock_file_error(PermissionError, all_files=False):
+        result = add(11, -2)
+        assert result == 9
+        captured = capsys.readouterr()
+        assert f"Ошибка записи в {temp_file}: PermissionError" in captured.out
+
+    new_file = os.path.join(temp_dir, "mylog_2.txt")
+    assert os.path.exists(new_file)
+    with open(new_file, 'r', encoding='utf-8') as f:
+        log_content = f.read().strip()
+    assert log_content.endswith("→ add. OK.")
+    created_files = [file for file in os.listdir(temp_dir) if
+                     file.startswith("mylog_") and file.endswith(".txt")]
+    assert sorted(created_files) == ["mylog_1.txt", "mylog_2.txt"]
+
+
+def test_file_write_high_number(
+    temp_file: str,
+    capsys: CaptureFixture[str],
+    mock_file_error: Callable,
+    log_decorators_write_to_temp_file: None,
+) -> None:
+    """
+    Проверяет запись в mylog_1000.txt, если mylog_1.txt до mylog_999.txt существуют.
+    :param temp_file:
+    :param capsys:
+    :param mock_file_error:
+    :param log_decorators_write_to_temp_file:
+    :return:
+    """
+    temp_dir = os.path.dirname(temp_file)
+    # Создаём файлы mylog_1.txt до mylog_999.txt
+    for number in range(1, 1000):
+        existing_file = os.path.join(temp_dir, f"mylog_{number}.txt")
+        with open(existing_file, 'w', encoding='utf-8') as file:
+            file.write("Запись существует.\n")
+
+    @log(filename=temp_file)
+    def add(*args: Any, **kwargs: dict[str, Never]) -> int:
+        return sum(args)
+
+    with mock_file_error(PermissionError, all_files=False):
+        result = add(-1, 21)
+        assert result == 20
+        captured = capsys.readouterr()
+        assert f"Ошибка записи в {temp_file}: PermissionError" in captured.out
+
+    new_file = os.path.join(temp_dir, "mylog_1000.txt")
+    assert os.path.exists(new_file)
+    with open(new_file, 'r', encoding='utf-8') as file:
+        log_content = file.read().strip()
+    assert log_content.endswith("→ add. OK.")
+    created_files = [file for file in os.listdir(temp_dir) if
+                     file.startswith("mylog_") and file.endswith(".txt")]
+    assert "mylog_1000.txt" in created_files
+
+
+@pytest.mark.parametrize("error_type", [PermissionError, OSError])
+def test_file_write_max_attempts_error(
+    temp_file: str,
+    capsys: CaptureFixture[str],
+    mock_file_error: Callable,
+    log_decorators_write_to_temp_file: None,
+    error_type: type
+) -> None:
+    """
+    Проверяет выброс исключения, когда превышен лимит попыток записи (1000 файлов).
+    :param temp_file:
+    :param capsys:
+    :param mock_file_error:
+    :param log_decorators_write_to_temp_file:
+    :param error_type:
+    :return:
+    """
+    @log(filename=temp_file)
+    def add(*args: Any, **kwargs: Any) -> int:
+        return sum(args)
+
+    with mock_file_error(error_type, all_files=True):
+        with pytest.raises(RuntimeError) as exc_info:
+            add(1, 2)
+        assert str(exc_info.value) == f"Ошибка записи в mylog_n.txt после {MAX_ATTEMPTS} попыток."
+        captured = capsys.readouterr()
+        assert f"Ошибка записи в {temp_file}: {error_type.__name__}" in captured.out
+
+    temp_dir = os.path.dirname(temp_file)
+    created_files = [file for file in os.listdir(temp_dir) if
+                     file.startswith("mylog_") and file.endswith(".txt")]
+    assert created_files == []
