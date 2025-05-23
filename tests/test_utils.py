@@ -8,7 +8,7 @@ from src.utils import load_transactions
 @pytest.fixture
 def valid_transactions() -> List[Dict[str, Any]]:
     """
-
+    Возвращает корректные тестовые транзакции. Фикстура.
     :return:
     """
     return [
@@ -36,7 +36,7 @@ def valid_transactions() -> List[Dict[str, Any]]:
 @pytest.fixture
 def invalid_transactions() -> List[Any]:
     """
-
+    Возвращает некорректные тестовые транзакции. Фикстура.
     :return:
     """
     return [
@@ -90,11 +90,11 @@ def test_load_transactions(
         invalid_transactions: List[str]
 ) -> None:
     """
-
-    :param mock_data:
-    :param required_keys:
-    :param expected:
-    :return:
+    Проверка загрузки корректных транзакций. Тестирование.
+    :param mock_data: Ключ для выбора тестовых данных.
+    :param required_keys: Список обязательных ключей.
+    :param expected: Ожидаемое количество валидных транзакций.
+    :assert:
     """
     data = valid_transactions if mock_data == "valid_data" else invalid_transactions
     test_file = json.dumps(data, ensure_ascii=False)
@@ -109,8 +109,8 @@ def test_load_transactions(
 
 def test_load_transactions_empty_file() -> None:
     """
-
-    :return:
+    Проверка, возвращаемого пустого списка, при пустом входном файле. Тестирование.
+    :assert:
     """
     with (
         patch("os.path.exists", return_value=True),
@@ -122,8 +122,8 @@ def test_load_transactions_empty_file() -> None:
 
 def test_load_transactions_not_found_file() -> None:
     """
-
-    :return:
+    Проверка, возвращаемого пустого списка, при отсутствии входного файла. Тестирование.
+    :assert:
     """
     with patch("os.path.exists", return_value=False):
         result = load_transactions("nonexistent.json")
@@ -132,8 +132,8 @@ def test_load_transactions_not_found_file() -> None:
 
 def test_load_transactions_json_invalid() -> None:
     """
-
-    :return:
+    Проверка, возвращаемого пустого списка, при не корректных данных в файле. Тестирование.
+    :assert:
     """
     with (
         patch("os.path.exists", return_value=True),
@@ -145,7 +145,7 @@ def test_load_transactions_json_invalid() -> None:
 
 def test_load_transactions_json_not_list() -> None:
     """
-
+    Проверка, что при JSON не-списке возбуждается TypeError. Тестирование.
     :return:
     """
     with (
