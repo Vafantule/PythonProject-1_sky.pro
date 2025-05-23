@@ -8,10 +8,10 @@ def load_transactions(
         required_keys: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     """
-
-    :param path:
-    :param required_keys:
-    :return:
+    Получение списка финансовых транзакций из файла JSON. Функция.
+    :param path: Путь до файла с данными.
+    :param required_keys: Ключи списка транзакций.
+    :return: Список словарей с данными о финансовых транзакциях.
     """
     if not os.path.exists(path):
         return []
