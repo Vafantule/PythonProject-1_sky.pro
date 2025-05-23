@@ -1,18 +1,17 @@
 from typing import Any, Dict
 from unittest.mock import Mock, patch
-from urllib.error import HTTPError
 
 import pytest
-from requests import ConnectionError, HTTPError, Timeout, RequestException
+from requests import ConnectionError, HTTPError, RequestException, Timeout
 
-from src.external_api import get_transaction_amount, get_api_key, get_exchange_rate
+from src.external_api import get_api_key, get_exchange_rate, get_transaction_amount
 
 
 # Блок тестирования вывода валюты в рублях функции def get_transaction_amount()
 @pytest.fixture
 def transaction_rub() -> Dict[str, Any]:
     """
-
+    RUB транзакция. Фикстура.
     :return:
     """
     return {
@@ -24,7 +23,7 @@ def transaction_rub() -> Dict[str, Any]:
 @pytest.fixture()
 def transaction_usd() -> Dict[str, Any]:
     """
-
+    USD транзакция. Фикстура.
     :return:
     """
     return {
@@ -36,7 +35,7 @@ def transaction_usd() -> Dict[str, Any]:
 @pytest.fixture
 def transaction_eur() -> Dict[str, Any]:
     """
-
+    EUR транзакция. Фикстура.
     :return:
     """
     return {
@@ -51,10 +50,10 @@ def transaction_eur() -> Dict[str, Any]:
 ])
 def test_transaction_rub(transaction: Dict[str, Any], expected: float) -> None:
     """
-
-    :param transaction:
-    :param expected:
-    :return:
+    RUB транзакция возвращают исходную сумму. Тестирование.
+    :param transaction: Вводные данные в виде транзакции.
+    :param expected: Ожидаемый результат.
+    :assert:
     """
     result = get_transaction_amount(transaction)
     assert result == expected
@@ -76,12 +75,12 @@ def test_foreign_currency_transaction(
         expected: float,
 ) -> None:
     """
-
-    :param mock_get_exchange_rate:
-    :param transaction:
-    :param rate:
-    :param expected:
-    :return:
+    USD/EUR транзакции корректно конвертируются по курсу. Тестирование.
+    :param mock_get_exchange_rate: Заглушка конвертации.
+    :param transaction: Вводные данные в виде транзакции.
+    :param rate: Курс для конвертации.
+    :param expected: Ожидаемый результат.
+    :assert:
     """
     mock_get_exchange_rate.return_value = rate
     result = get_transaction_amount(transaction)
@@ -96,11 +95,11 @@ def test_api_exceptions(
         transaction_usd: Dict[str, Any]
 ) -> None:
     """
-
-    :param mock_get_exchange_rate:
-    :param mock_get_api_key:
-    :param transaction_usd:
-    :return:
+    При ошибках API возвращается 0.0. Тестирование.
+    :param mock_get_exchange_rate: Заглушка конвертации.
+    :param mock_get_api_key: Заглушка ключа API.
+    :param transaction_usd: Тестовое значение валюты.
+    :assert:
     """
     from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 
@@ -111,7 +110,7 @@ def test_api_exceptions(
 
 def test_currency_unsupported() -> None:
     """
-
+    Неподдерживаемая валюта вызывает ValueError. Тестирование.
     :return:
     """
     transaction = {"operationAmount": {"amount": "10.00", "currency": {"code": "XYZ"}}}
@@ -127,11 +126,11 @@ def test_read_from_file(
         transaction_rub: Dict[str, Any]
 ) -> None:
     """
-
+    Чтение транзакции из файла. Тестирование.
     :param mock_json_load:
     :param mock_open:
     :param transaction_rub:
-    :return:
+    :assert:
     """
     mock_json_load.return_value = transaction_rub
     result = get_transaction_amount("fake_file.json")   # type: ignore
@@ -143,7 +142,7 @@ def test_read_from_file(
 @patch("src.external_api.load_dotenv")
 def test_get_api_key_found(mock_load_dotenv: Mock, mock_getenv: Mock) -> None:
     """
-
+    get_api_key возвращает ключ, если он найден в .env. Тестирование.
     :param mock_load_dotenv:
     :param mock_getenv:
     :return:
@@ -158,7 +157,7 @@ def test_get_api_key_found(mock_load_dotenv: Mock, mock_getenv: Mock) -> None:
 @patch("src.external_api.load_dotenv")
 def test_get_api_key_not_found(mock_load_dotenv: Mock, mock_getenv: Mock) -> None:
     """
-
+    get_api_key выбрасывает ValueError, если ключ не найден. Тестирование.
     :param mock_load_dotenv:
     :param mock_getenv:
     :return:
@@ -174,7 +173,7 @@ def test_get_api_key_not_found(mock_load_dotenv: Mock, mock_getenv: Mock) -> Non
 @patch("requests.get")
 def test_get_exchange_rate_success(mock_get: Mock) -> None:
     """
-
+    get_exchange_rate возвращает корректный курс при успешном ответе API. Тестирование.
     :param mock_get:
     :return:
     """
@@ -188,9 +187,9 @@ def test_get_exchange_rate_success(mock_get: Mock) -> None:
 
 
 @patch("requests.get")
-def test_get_exchange_rate_not_found(mock_get: Mock) -> None:
+def test_get_exchange_rate_currency_not_found(mock_get: Mock) -> None:
     """
-
+    get_exchange_rate вызывает KeyError, если нужная валюта отсутствует в ответе API. Тестирование.
     :param mock_get:
     :return:
     """
@@ -210,9 +209,9 @@ def test_get_exchange_rate_not_found(mock_get: Mock) -> None:
     Timeout("Timeout"),
     RequestException("RequestException")
 ])
-def test_get_exchange_rate_not_requests_exceptions(mock_get: Mock, exc: Exception):
+def test_get_exchange_rate_not_requests_exceptions(mock_get: Mock, exc: Exception) -> None:
     """
-
+    get_exchange_rate пробрасывает requests-исключения. Тестирование.
     :param mock_get:
     :param exc:
     :return:
