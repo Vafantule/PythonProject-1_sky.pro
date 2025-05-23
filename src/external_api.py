@@ -84,16 +84,16 @@ def get_transaction_amount(transaction: Dict[str, Any]) -> float:
         raise ValueError(f"Не задана валюта: {currency_code}")
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # Чтение всех транзакций из файла
     # with open("data/operations.json", "r", encoding="utf-8") as f:
     #     operations = json.load(f)
-    # for op in operations:
+    # for operation in operations:
     #     try:
-    #         rub_amount = get_transaction_amount(op)
-    #         print(f"ID: {op['id']}, сумма в RUB: {rub_amount}")
+    #         rub_amount = get_transaction_amount(operation)
+    #         print(f"ID: {operation['id']}, сумма в RUB: {rub_amount}")
     #     except Exception as error:
-    #         print(f"Ошибка при обработке транзакции {op.get('id')}: {error}")
+    #         print(f"Ошибка при обработке транзакции {operation.get('id')}: {error}")
 
     rub_amount = get_transaction_amount({
         "id": 879660146,
