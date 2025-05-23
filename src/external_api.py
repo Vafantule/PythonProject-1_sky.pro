@@ -67,15 +67,15 @@ def get_transaction_amount(transaction: Dict[str, Any]) -> float:
             transaction = json.load(file)
 
     amount_str: str = transaction["operationAmount"]["amount"]
-    currency_code: str = transaction["operationAmount"]["currency"]["code"]
+    currency_code: str = transaction["operationAmount"]["currency"]["code"].lower()
     amount: float = float(amount_str)
 
-    if currency_code == "RUB":
+    if currency_code == "rub":
         return amount
-    elif currency_code in ("USD", "EUR"):
+    elif currency_code in ("usd", "eur"):
         api_key = get_api_key()
         try:
-            rate = get_exchange_rate(currency_code, "RUB", api_key)
+            rate = get_exchange_rate(currency_code.upper(), "RUB", api_key)
             return round(amount * rate, 2)
         except (ConnectionError, HTTPError, Timeout, RequestException):
             print("Ошибка получения курса валюты.")
@@ -103,7 +103,7 @@ if __name__ == "__main__":
           "amount": "92130.50",
           "currency": {
             "name": "rub",
-            "code": "RUB"
+            "code": "usd"
           }
         },
         "description": "Перевод организации",
