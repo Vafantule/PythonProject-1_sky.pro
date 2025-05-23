@@ -9,7 +9,7 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException, Ti
 
 def get_api_key() -> str:
     """
-
+    Загрузка API ключа из .env файла. Функция.
     :return:
     """
     load_dotenv()
@@ -21,11 +21,11 @@ def get_api_key() -> str:
 
 def get_exchange_rate(from_currency: str, to_currency: str, api_key: str) -> float:
     """
-
-    :param from_currency:
-    :param to_currency:
-    :param api_key:
-    :return:
+    Получение курса валюты с использованием Exchange Rates Data API. Функция.
+    :param from_currency: Исходная валюта для конвертации.
+    :param to_currency: Итоговая валюта для конвертации.
+    :param api_key: API ключ для подключения к сайту.
+    :return: Итоговый результат конвертации.
     """
     url = (
         f"https://api.apilayer.com/exchangerates_data/latest"
@@ -57,8 +57,9 @@ def get_exchange_rate(from_currency: str, to_currency: str, api_key: str) -> flo
 
 def get_transaction_amount(transaction: Dict[str, Any]) -> float:
     """
-
-    :param transaction:
+    Возвращает сумму транзакции в рублях.
+    Если валюта не RUB, конвертирует через Exchange Rates Data API. Функция.
+    :param transaction: Словарь с транзакцией либо путь к файлу с данными для обработки.
     :return:
     """
     # Возможное чтение данных из файла json.
