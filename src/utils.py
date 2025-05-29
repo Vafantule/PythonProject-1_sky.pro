@@ -94,7 +94,7 @@ def load_transactions(
         raise error
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     keys = ["id", "state", "date", "operationAmount", "description", "from", "to"]
     transactions = load_transactions("data/operations.json", required_keys=keys)
     for transaction in transactions:
