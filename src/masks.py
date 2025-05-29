@@ -5,7 +5,7 @@ import re
 
 def get_logger(for_test: bool = False) -> logging.Logger:
     """
-
+    Создание файла с логами по заданному формату. Функция.
     :return:
     """
     if not os.path.exists("logs"):
@@ -23,7 +23,7 @@ def get_logger(for_test: bool = False) -> logging.Logger:
         logger_name = f"{module_name}_log"
 
     logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     if not logger.handlers:
         handler = logging.FileHandler(log_filename, "w", encoding="utf-8")
@@ -71,7 +71,7 @@ def get_mask_card_number(user_card_number_input: str, for_test: bool = False) ->
         raise
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     print(get_mask_card_number(input("Ввод номера карты: ")))
 
 

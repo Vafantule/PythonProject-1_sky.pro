@@ -35,7 +35,7 @@ def get_logger(name: Optional[str] = None, log_file: Optional[str] = None) -> lo
                                            datefmt='%Y-%m-%d %H:%M:%S')
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.DEBUG)
     return logger
 
 
