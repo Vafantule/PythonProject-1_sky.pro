@@ -17,10 +17,10 @@ def get_logger(for_test: bool = False) -> logging.Logger:
 
     if for_test:
         log_filename = os.path.join(log_dir, f"test_{module_name}.log")
-        logger_name = f"test_{module_name}_logger"
+        logger_name = f"test_{module_name}_log"
     else:
         log_filename = os.path.join(log_dir, f"{module_name}.log")
-        logger_name = f"{module_name}_logger"
+        logger_name = f"{module_name}_log"
 
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
@@ -76,12 +76,14 @@ def get_mask_card_number(user_card_number_input: str, for_test: bool = False) ->
 
 
 # Функция для маскировки номера счета
-def get_mask_account(user_account_number_input: str) -> str:
+def get_mask_account(user_account_number_input: str, for_test: bool = False) -> str:
     """
     Функция отображения '**' + последние 4 символов номера счета.
+    :param for_test:
     :param user_account_number_input: Вводимый номер счета.
     :return: Вывод отформатированной строки номера счета.
     """
+    log = get_logger(for_test=for_test)
     # Удаляем все нецифровые символы
     digits = ""
     for char in user_account_number_input:
@@ -90,12 +92,15 @@ def get_mask_account(user_account_number_input: str) -> str:
 
     # Проверяем длину
     if len(digits) != 20:
+        log.error(f"Ошибка: Номер счета должен содержать ровно 20 цифр. "
+                 f"Введено: {user_account_number_input}")
         raise ValueError(
             f"Номер счета должен содержать ровно 20 цифр, но содержит: {len(digits)}. "
             f"Входное значение: {digits if digits else 'пустая строка'}")
 
     # Создаем маску: ** + последние 4 цифры
     masked = "**" + digits[-4:]
+    log.info(f"Вводные данные: {user_account_number_input} Вывод: {masked}")
     return masked
 
 
