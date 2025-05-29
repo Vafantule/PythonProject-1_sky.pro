@@ -4,13 +4,12 @@ import pytest
 
 from src.masks import get_mask_account, get_mask_card_number
 
-
 # Блок тестирования номера карты.
 
-# Тест с использованием фикстуры.
+# Тест с использованием фикстуры
 def test_valid_card_numbers_with_fixture(valid_card_numbers: List[Tuple[str, str]]) -> None:
     for input_number, expected in valid_card_numbers:
-        assert get_mask_card_number(input_number, for_test=True) == expected
+        assert get_mask_card_number(input_number) == expected
 
 
 # Тест для корректных номеров с параметризацией
@@ -23,7 +22,7 @@ def test_valid_card_numbers_with_fixture(valid_card_numbers: List[Tuple[str, str
     ("1234!5678@9012#3456$789", "1234 56** ******* 6789"),  # Со спецсимволами
 ])
 def test_valid_card_numbers(input_number: str, expected: str) -> None:
-    assert get_mask_card_number(input_number, for_test=True) == expected
+    assert get_mask_card_number(input_number) == expected
 
 
 # Тест для некорректных номеров с параметризацией
@@ -36,7 +35,7 @@ def test_valid_card_numbers(input_number: str, expected: str) -> None:
 def test_invalid_card_numbers(input_number: str) -> None:
     with pytest.raises(ValueError,
                        match="Ошибка: Длина номера карты должна быть от 12 до 19 символов."):
-        get_mask_card_number(input_number, for_test=True)
+        get_mask_card_number(input_number)
 
 
 # Блок тестирования номера счета.
