@@ -1,9 +1,10 @@
 from typing import Any, Dict, List
 from unittest.mock import mock_open, patch
 
+import pandas
 import pytest
 
-from src.fin_read import read_financial_operations_from_csv_files
+from src.fin_read import read_financial_operations_from_csv_files, read_financial_operations_from_xlsx_files
 
 
 # Блок тестирования чтения из cvs файла
@@ -95,3 +96,119 @@ def test_read_financial_operations_from_csv_files_param(csv_data: str, expected:
 def test_read_financial_operations_from_csv_files_not_found() -> None:
     with pytest.raises(FileNotFoundError):
         read_financial_operations_from_csv_files("no_such_file.csv")
+
+
+# Блок тестирования чтения из xlsx файла
+
+@pytest.fixture
+def xlsx_dataframe() -> pandas.DataFrame:
+    data = {
+        "id": ["1449073", "2029174"],
+        "state": ["CANCELED", "EXECUTED"],
+        "date": ["2021-05-11T10:06:51Z", "2022-08-09T17:12:27Z"],
+        "amount": ["11834", "34143"],
+        "currency_name": ["Rupiah", "Yuan Renminbi"],
+        "currency_code": ["IDR", "CNY"],
+        "from": ["Счет 17847122626293622323", "Visa 2717112074981212"],
+        "to": ["Счет 68570011224094542755", "Discover 8397322380849617"],
+        "description": ['Перевод со счета на счет', "Перевод с карты на карту"],
+    }
+    return pandas.DataFrame(data)
+
+
+@pytest.fixture
+def xlsx_rows() -> List[Dict[str, Any]]:
+    return [
+        {
+            "id": "1449073",
+            "state": "CANCELED",
+            "date": "2021-05-11T10:06:51Z",
+            "amount": "11834",
+            "currency_name": "Rupiah",
+            "currency_code": "IDR",
+            "from": "Счет 17847122626293622323",
+            "to": "Счет 68570011224094542755",
+            "description": "Перевод со счета на счет",
+        },
+        {
+            "id": "2029174",
+            "state": "EXECUTED",
+            "date": "2022-08-09T17:12:27Z",
+            "amount": "34143",
+            "currency_name": "Yuan Renminbi",
+            "currency_code": "CNY",
+            "from": "Visa 2717112074981212",
+            "to": "Discover 8397322380849617",
+            "description": "Перевод с карты на карту",
+        },
+    ]
+
+
+def test_read_financial_operations_from_xlsx_files(
+        xlsx_dataframe: pandas.DataFrame,
+        xlsx_rows: List[Dict[str, Any]]
+) -> None:
+    with patch("pandas.read_excel", return_value=xlsx_dataframe) as mock_read_excel:
+        result = read_financial_operations_from_xlsx_files("fake.xlsx")
+        assert result == xlsx_rows
+        mock_read_excel.assert_called_once_with("fake.xlsx")
+        assert set(result[0].keys()) == {
+            "id", "state", "date", "amount",
+            "currency_name", "currency_code",
+            "from", "to", "description"
+        }
+
+
+@pytest.mark.parametrize("dataframe_data, expected", [
+    (
+        {
+            "id": [],
+            "state": [],
+            "date": [],
+            "amount": [],
+            "currency_name": [],
+            "currency_code": [],
+            "to": [],
+            "description": [],
+        },
+        [],
+    ),
+    (
+        {
+            "id": [282352],
+            "state": ["PENDING"],
+            "date": ["2020-12-26T09:39:00Z"],
+            "amount": [32566],
+            "currency_name": ["Rupiah"],
+            "currency_code": ["IDR"],
+            "to": ["Счет 87117715624747483097"],
+            "description": ["Открытие вклада"],
+        },
+        [
+            {
+                "id": 282352,
+                "state": "PENDING",
+                "date": "2020-12-26T09:39:00Z",
+                "amount": 32566,
+                "currency_name": "Rupiah",
+                "currency_code": "IDR",
+                "to": "Счет 87117715624747483097",
+                "description": "Открытие вклада",
+            }
+        ],
+    ),
+])
+def test_read_financial_operations_from_xlsx_file_param(
+        dataframe_data: Dict[str, List],
+        expected: List[Dict[str, Any]]
+) -> None:
+    dafaframe = pandas.DataFrame(dataframe_data)
+    with patch("pandas.read_excel", return_value=dafaframe):
+        result = read_financial_operations_from_xlsx_files("fake.xlsx")
+        assert result == expected
+
+
+def test_read_financial_operations_from_xlsx_files_not_found() -> None:
+    with patch("pandas.read_excel", side_effect=FileNotFoundError):
+        with pytest.raises(FileNotFoundError):
+            read_financial_operations_from_xlsx_files("no_such_file.xlsx")
