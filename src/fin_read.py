@@ -6,9 +6,9 @@ import pandas
 
 def read_financial_operations_from_csv_files(file_path: str) -> List[Dict[str, Any]]:
     """
-
-    :param file_path:
-    :return:
+    Чтение данных из cvs-файла. Функция.
+    :param file_path: Путь и файл с данными для обработки.
+    :return: Возвращает список словарей из файла.
     """
     operations = []
     with open(file_path, newline='', encoding='utf-8') as csvfile:
@@ -26,9 +26,9 @@ def read_financial_operations_from_csv_files(file_path: str) -> List[Dict[str, A
 
 def read_financial_operations_from_xlsx_files(file_path: str) -> list[dict[Hashable, Any]]:
     """
-
-    :param file_path:
-    :return:
+    Чтение данных из xlsx-файла (Excel). Функция.
+    :param file_path: Путь и файл с данными для обработки.
+    :return: Возвращает список словарей из файла.
     """
     dataframe = pandas.read_excel(file_path)
     operations = dataframe.to_dict(orient="records")
