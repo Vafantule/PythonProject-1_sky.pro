@@ -80,6 +80,60 @@ for desc in transaction_descriptions(transactions):
 Нет необходимого словаря.
 ```
 
+## Модуль fin_read
+
+### 
+Предназначен для чтения и обработки данных 
+финансовых операциях из файлов формата CSV и Excel (XLSX). 
+Функции возвращают список словарей, словарь - отдельная транзакция
+с ключами по названиям столбцов.
+
+## Основные функции
+
+### `read_financial_operations_from_csv_files(file_path: str) -> List[Dict[str, Any]]`
+
+- Читает финансовые операции из CVS-файла.
+- `file_path` - путь к CVS-файлу
+- Возвращает:
+  - Список словарей, каждый соответствует одной строке (операции) из файла.
+  
+### `read_financial_operations_from_xlsx_files(file_path: str) -> List[Dict[str, Any]]`
+
+- Читает финансовые операции из Excel-файла (xlsx).
+- `file_path` - путь к XLSX-файлу
+- Возвращает:
+  - Список словарей, каждый соответствует одной строке (операции) из файла.
+  
+## Требования
+
+- Python 3.7+
+- Зависимости:
+  - `pandas`
+  - `openpyxl` (для поддержки чтения .xlsx-файлов)
+
+Установить зависимости можно командой:
+```bash
+pip install pandas openpyxl
+```
+
+## Примеры использования:
+
+```python
+
+# Чтение из CSV-файла
+from fin_read import read_financial_operations_from_csv_files, read_financial_operations_from_xlsx_files
+cvs_transactions = read_financial_operations_from_csv_files("transactions.csv")
+for row in cvs_transactions:
+    print(row)
+
+# Чтение из Excel
+xlsx_transactions = read_financial_operations_from_xlsx_files("transactions_excel.xlsx")
+for row in xlsx_transactions:
+    print(row)
+```
+
+
+
 ### Запуск тестов для проверки стабильности кода:
 ```
 Тестирование
