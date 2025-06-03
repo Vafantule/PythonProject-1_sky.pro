@@ -1,5 +1,8 @@
 import re
+from collections import Counter
 from typing import Any, Dict, List
+
+from src.fin_read import read_financial_operations_from_xlsx_files
 
 
 def transaction_search(transactions: List[Dict[str, Any]], search_string: str) -> List[Dict[str, Any]]:
@@ -46,3 +49,30 @@ def transaction_search(transactions: List[Dict[str, Any]], search_string: str) -
 #
 #     result = transaction_search(transactions, '2641084763468257')
 #     print(result)
+
+
+def count_transactions_by_category(transactions: List[Dict[str, Any]], categories: List[str]) -> Dict[str, int]:
+    """
+     Подсчёт количества банковских операций для каждой категории,
+     ища вхождение любой части названия категории среди всех значений всех ключей каждой транзакции.
+     Функция.
+    :param transactions: Список транзакций для обработки.
+    :param categories: Список с данными для подсчёта.
+    :return: Возвращает словарь с данными.
+    """
+    descriptions = [transaction.get("description", "") for transaction in transactions]
+    counter = Counter(descriptions)
+    for transaction in transactions:
+        values = [str(value) for value in transaction.values()]
+        for category in categories:
+            if category in values:
+                counter[category] += 1
+    return {category: counter.get(category, 0) for category in categories}
+
+
+# if __name__ == "__main__":
+#     transactions = read_financial_operations_from_xlsx_files('data/transactions_excel.xlsx')
+#     categories = ['PHP', 'Перевод с карты на карту']
+#
+#     category_counts = count_transactions_by_category(transactions, categories)
+#     print(category_counts)
