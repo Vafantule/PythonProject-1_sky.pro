@@ -81,25 +81,46 @@ transactions = (
 )
 
 
-def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -> (
-        Generator)[dict[str, Any], Any, None]:
+def filter_by_currency(transactions: List[Dict[str, Any]], currency_code: str) -> list[dict[str, Any]]:
     """
     Отбор данных по отобранной валюте. Функция.
     :param transactions: Данные для отбора.
     :param currency_code: Код валюты для отбора транзакций.
     :yield:
     """
-    if not isinstance(transactions, list):
-        raise ValueError("Ошибка. Необходимо предоставить список словарей.")
-    if not all(isinstance(transaction, dict) for transaction in transactions):
-        raise ValueError("Транзакции должны быть представлены в виде словаря.")
+    # if not isinstance(transactions, list):
+    #     raise ValueError("Ошибка. Необходимо предоставить список словарей.")
+    # if not all(isinstance(transaction, dict) for transaction in transactions):
+    #     raise ValueError("Транзакции должны быть представлены в виде словаря.")
+    #
+    # for transaction in transactions:
+    #     currency = transaction.setdefault("operationAmount",
+    #                                       {}).setdefault("currency",
+    #                                                      {}).setdefault("code")
+    #     if currency == currency_code:
+    #         yield transaction
 
+    result = []
     for transaction in transactions:
-        currency = transaction.setdefault("operationAmount",
-                                          {}).setdefault("currency",
-                                                         {}).setdefault("code")
-        if currency == currency_code:
-            yield transaction
+        # Пробуем JSON-структуру
+        code = None
+        op_amount = transaction.get("operationamount") or transaction.get("operationAmount")
+        if op_amount and isinstance(op_amount, dict):
+            cur = op_amount.get("currency")
+            if cur and isinstance(cur, dict):
+                code = cur.get("code", "")
+        # Пробуем плоскую структуру (CSV/XLSX)
+        if not code:
+            code = (
+                transaction.get("currency_code")
+                or transaction.get("currency")
+                or transaction.get("currency_name")
+                or ""
+            )
+        # Убираем пробелы и приводим к верхнему регистру
+        if str(code).strip().upper() == currency_code.upper():
+            result.append(transaction)
+    return result
 
 
 # Получить итератор для транзакций в валюте.

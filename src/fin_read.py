@@ -12,9 +12,13 @@ def read_financial_operations_from_csv_files(file_path: str) -> List[Dict[str, A
     """
     operations = []
     with open(file_path, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
+        reader = csv.DictReader(csvfile, delimiter=';')
         for row in reader:
-            operations.append(dict(row))
+            cleaned_row = {
+                key.strip().lower():
+                    (value.strip() if isinstance(value, str) else value)
+                for key, value in row.items()}
+            operations.append(cleaned_row)
     return operations
 
 
@@ -39,9 +43,9 @@ def read_financial_operations_from_xlsx_files(file_path: str) -> list[dict[Hasha
 #     xlsx_transactions = read_financial_operations_from_xlsx_files('data/transactions_excel.xlsx')
 #
 #     for transaction in xlsx_transactions:
-#         if transaction.setdefault('id') == 5446796.0:
-#             print("Транзакция:")
+#         if transaction.setdefault('state') == "PENDING":
+#             # print("Транзакция:")
 #             print(transaction)
-#             break
+#             # break
 #     else:
 #         print(f"Транзакция с id не найдена.")

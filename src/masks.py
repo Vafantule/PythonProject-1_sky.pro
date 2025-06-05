@@ -71,8 +71,8 @@ def get_mask_card_number(user_card_number_input: str, for_test: bool = False) ->
         raise
 
 
-if __name__ == "__main__":
-    print(get_mask_card_number(input("Ввод номера карты: ")))
+# if __name__ == "__main__":
+#     print(get_mask_card_number(input("Ввод номера карты: ")))
 
 
 # Функция для маскировки номера счета
@@ -105,4 +105,4 @@ def get_mask_account(user_account_number_input: str, for_test: bool = False) -> 
 
 
 # if __name__ == "__main__":
-    print(get_mask_account(input("Ввод номера счета: ")))
+#     print(get_mask_account(input("Ввод номера счета: ")))
