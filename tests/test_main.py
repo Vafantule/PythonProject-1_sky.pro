@@ -1,8 +1,10 @@
-import pytest
-from typing import Dict, List, Any
-from unittest.mock import patch, MagicMock
+from typing import Any, Dict, List
+from unittest.mock import patch
 
-from src.main import lower_keys, print_transaction, main
+import pytest
+from _pytest.capture import CaptureFixture
+
+from src.main import lower_keys, main, print_transaction
 
 
 @pytest.mark.parametrize("input_odj, expected", [
@@ -66,7 +68,8 @@ def test_lower_keys(input_odj: Any, expected: Any) -> None:
         ),
     ]
 )
-def test_print_transaction(transaction: Dict[str, Any], expected: List[str], capsys) -> None:
+def test_print_transaction(transaction: Dict[str, Any], expected: List[str], capsys: CaptureFixture[str]
+) -> None:
     with patch("src.main.mask_account_card",
                side_effect=lambda element: element[:6] + "******" + element[-4:]
                if len(element) >= 10 else ""):
@@ -76,7 +79,7 @@ def test_print_transaction(transaction: Dict[str, Any], expected: List[str], cap
             assert line in captured.out
 
 
-def test_main_json(mock_print_transaction=None) -> None:
+def test_main_json() -> None:
     test_transactions = [
         {
             "date": "2024-06-05T12:00:00",
@@ -94,20 +97,17 @@ def test_main_json(mock_print_transaction=None) -> None:
         "нет",
         "нет"
     ])
-    with patch("builtins.input", side_effect=lambda _: next(input_sequence)), \
-        patch("src.main.load_transactions", return_value=test_transactions), \
-        patch("src.main.filter_by_state", side_effect=lambda transactions, state: transactions), \
-        patch("src.main.sort_by_date", side_effect=lambda transactions, reverse:transactions), \
-        patch("src.main.filter_by_currency", side_effect=lambda transactions, currency: transactions), \
-        patch("src.main.mask_account_card", side_effect=lambda element: element[:6] + "******" + element[-4:]
-               if len(element) >= 10 else ""), \
-        patch("src.main.print_transaction") as mock_print_transaction, \
-        patch("builtins.print") as mock_print:
+    with (patch("builtins.input", side_effect=lambda _: next(input_sequence)),
+          patch("src.main.load_transactions", return_value=test_transactions),
+          patch("src.main.filter_by_state", side_effect=lambda transactions, state: transactions),
+          patch("src.main.sort_by_date", side_effect=lambda transactions, reverse: transactions),
+          patch("src.main.filter_by_currency", side_effect=lambda transactions, currency: transactions),
+          patch("src.main.mask_account_card",
+                side_effect=lambda element:
+                element[:6] + "******" + element[-4:]if len(element) >= 10 else ""),
+          patch("src.main.print_transaction") as mock_print_transaction,
+          patch("builtins.print") as mock_print):
         main()
         mock_print_transaction.assert_called()
         found = any("Всего банковских операций в выборке: 1" in str(call) for call in mock_print.call_args_list)
         assert found
-
-
-
-
