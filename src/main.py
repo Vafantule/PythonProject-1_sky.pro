@@ -226,7 +226,14 @@ def print_transaction(transaction: Dict[str, Any]) -> None:
     description = transaction.get("description", "")
 
     # Сумма и валюта
-    if "operationamount" in transaction:
+    if "operation_amount" in transaction:
+        amount = transaction["operation_amount"].get("amount", "")
+        currency_info = transaction["operation_amount"].get("currency", {})
+        if isinstance(currency_info, dict):
+            currency = currency_info.get("name", "") or currency_info.get("code", "")
+        else:
+            currency = ""
+    elif "operationamount" in transaction:
         amount = transaction["operationamount"].get("amount", "")
         currency_info = transaction["operationamount"].get("currency", {})
         if isinstance(currency_info, dict):
