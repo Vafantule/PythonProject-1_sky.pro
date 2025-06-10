@@ -7,6 +7,9 @@ from src.masks import get_mask_account, get_mask_card_number
 def mask_account_card(string_to_mask: str) -> str:
     """Платеж. система карты либо 'Счет', скрытие символов номера. Функция"""
     ### Честно спизженый код у другого студента.
+    if not isinstance(string_to_mask, str):
+        string_to_mask = str(string_to_mask)
+
     if card := re.search(r"(\s\d{16}$)", string_to_mask):
         return (f"{string_to_mask[:card.start()]} "
                 f"{get_mask_card_number(card.group()[1:])}"
@@ -45,5 +48,5 @@ def get_date(unformatted_date: str) -> str:
     return formatted_date
 
 
-if __name__ == "__main__":
-    print(get_date("2024-03-11T02:26:18.671407"))
+# if __name__ == "__main__":
+#     print(get_date("2024-03-11T02:26:18.671407"))

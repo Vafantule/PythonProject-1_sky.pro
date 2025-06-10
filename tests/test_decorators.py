@@ -1,12 +1,64 @@
+import builtins
 import os
+import tempfile
 from datetime import datetime
 from typing import Any, Callable, Generator, Optional, Union
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from _pytest.capture import CaptureFixture
 
 from src.decorators import MAX_ATTEMPTS, log
+
+
+@pytest.fixture
+def temp_file() -> Generator[str, Any, None]:
+    """
+    Создание и удаление временных файлов для тестирования функций.
+    :return:
+    """
+    temp = tempfile.NamedTemporaryFile(delete=False, mode="w", encoding="utf-8")
+    temp.close()
+
+    temp_dir = os.path.dirname(temp.name)
+    for file in os.listdir(temp_dir):
+        if file.startswith("mylog_") and file.endswith(".txt"):
+            os.remove(os.path.join(temp_dir, file))
+
+    yield temp.name
+
+    if os.path.exists(temp.name):
+        os.remove(temp.name)
+    for file in os.listdir(temp_dir):
+        if file.startswith("mylog_") and file.endswith(".txt"):
+            os.remove(os.path.join(temp_dir, file))
+
+
+@pytest.fixture
+def mock_file_error(temp_file: str) -> Callable[[type, bool], MagicMock]:
+    """
+    Имитация ошибки записи в файл для temp_file
+    :param temp_file: Временный файл.
+    :return:
+    """
+    def create_mock(error_type: type, all_files: bool = False) -> MagicMock:
+        """
+        Создание имитации ошибки.
+        :param all_files:
+        :param error_type: Тип ошибки.
+        :return:
+        """
+        real_open = builtins.open
+
+        def mock_open(*args: Any, **kwargs: Any) -> Any:
+            # if args and args[0] == temp_file:
+            if args:
+                if args[0] == temp_file or (all_files and 'mylog_' in
+                                            args[0] and args[0].endswith('.txt')):
+                    raise error_type("Ложная ошибка")
+            return real_open(*args, **kwargs)
+        return patch("builtins.open", side_effect=mock_open)
+    return create_mock
 
 
 @pytest.fixture
